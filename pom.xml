@@ -33,7 +33,7 @@
   <!-- Shared properties -->
   <properties>
     <!-- Frameworks -->
-    <java.version>1.8</java.version>
+    <java.version>11</java.version>
     <maven.version>3.2.1</maven.version>
     <spring.version>5.1.2.RELEASE</spring.version>
 
@@ -70,7 +70,7 @@
     <maven-compiler.source>${java.version}</maven-compiler.source>
     <maven-compiler.target>${java.version}</maven-compiler.target>
 
-    <maven-aspectj.version>1.11</maven-aspectj.version>
+    <maven-aspectj.version>1.11.1</maven-aspectj.version>
     <maven-aspectj.compliance>${java.version}</maven-aspectj.compliance>
 
     <maven-antrun.version>1.8</maven-antrun.version>
@@ -459,7 +459,8 @@
         <!-- AspectJ -->
 
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
+	  <groupId>com.github.m50d</groupId>
+          <!-- <groupId>org.codehaus.mojo</groupId> -->
           <artifactId>aspectj-maven-plugin</artifactId>
           <version>${maven-aspectj.version}</version>
           <!-- Need to override aspectjtools version, see -->

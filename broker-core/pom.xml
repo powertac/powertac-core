@@ -78,8 +78,10 @@
 
       <!-- Needs AspectJ build -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
+	<groupId>com.github.m50d</groupId>
+        <!-- <groupId>org.codehaus.mojo</groupId> -->
         <artifactId>aspectj-maven-plugin</artifactId>
+        <version>${maven-aspectj.version}</version>
       </plugin>
 
     </plugins>
