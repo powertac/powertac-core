@@ -21,27 +21,21 @@ import java.io.StringWriter;
 
 import org.junit.jupiter.api.Test;
 import org.powertac.common.XMLMessageConverter;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
+//import org.springframework.test.context.TestContextManager;
 import com.thoughtworks.xstream.XStream;
 
 /**
  * @author jcollins
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class DistributionReportTest
 {
-  TestContextManager f;
+  //TestContextManager f;
 
   /**
    * Test method for {@link org.powertac.common.msg.DistributionReport#DistributionReport(int, double, double)}.

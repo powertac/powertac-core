@@ -15,9 +15,12 @@
  */
 package org.powertac.common;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.Instant;
 import org.powertac.common.config.ConfigurableValue;
 import org.powertac.common.msg.MarketBootstrapData;
 import org.powertac.common.spring.SpringApplicationContext;
@@ -230,16 +233,16 @@ public class TariffEvaluationHelper
     computeAlpha(tariff);
     double dailyUsage = 0.0;
     double result = 0.0;
-    //Instant time = timeService.getCurrentTime();
     Instant time = start;
     if (null == time)
       log.error("Time is null!");
     for (int index = 0; index < usage.length; index++) {
-      time = time.plus(TimeService.HOUR);
+      // TODO -- hard-coded one hour granularity
+      time = time.plusMillis(TimeService.HOUR);
       result += tariff.getUsageCharge(time, usage[index], dailyUsage, this);
       if (includePeriodicCharge)
         result += tariff.getPeriodicPayment() / 24.0;
-      if (time.toDateTime().getHourOfDay() == 0) {
+      if (ZonedDateTime.ofInstant(time, TimeService.utc).get(ChronoField.HOUR_OF_DAY) == 0) {
         //reset the daily usage counter
         dailyUsage = 0.0;
       }
@@ -367,7 +370,7 @@ public class TariffEvaluationHelper
     double[] result = new double[usage.length];
     Instant time = timeService.getCurrentTime();
     for (int index = 0; index < usage.length; index++) {
-      time = time.plus(TimeService.HOUR);
+      time = time.plusMillis(TimeService.HOUR);
       result[index] = tariff.getUsageCharge(time, usage[index], dailyUsage, this);
       if (includePeriodicCharge)
         result[index] += tariff.getPeriodicPayment() / 24.0;

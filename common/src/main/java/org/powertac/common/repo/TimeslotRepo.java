@@ -15,14 +15,13 @@
  */
 package org.powertac.common.repo;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.powertac.common.Competition;
 import org.powertac.common.TimeService;
 import org.powertac.common.Timeslot;
@@ -65,7 +64,8 @@ public class TimeslotRepo implements DomainRepo
   {
     long duration = Competition.currentCompetition().getTimeslotDuration();
     Instant base = Competition.currentCompetition().getSimulationBaseTime();
-    int index = (int)((startTime.getMillis() - base.getMillis()) / duration);
+    int index = (int)((startTime.toEpochMilli()
+                       - base.toEpochMilli()) / duration);
     if (index < 0)
       log.error("makeTimeslot(" + startTime.toString()
                 + "): index=" + index + ", base=" + base);
@@ -73,6 +73,7 @@ public class TimeslotRepo implements DomainRepo
     Timeslot result;
     if (index >= indexedTimeslots.size()) {
       // create new timeslot
+      log.debug("Creating new timeslot {}", index);
       result = new Timeslot(index, realStart);
       add(result);
     }
@@ -139,8 +140,8 @@ public class TimeslotRepo implements DomainRepo
    */
   public int getTimeslotIndex (Instant time)
   {
-    long offset = time.getMillis()
-            - Competition.currentCompetition().getSimulationBaseTime().getMillis();
+    long offset = time.toEpochMilli()
+            - Competition.currentCompetition().getSimulationBaseTime().toEpochMilli();
     long duration = Competition.currentCompetition().getTimeslotDuration();
     // truncate to timeslot boundary
     return (int)(offset / duration);
@@ -222,19 +223,19 @@ public class TimeslotRepo implements DomainRepo
   public Instant getTimeForIndex (int index)
   {
     Competition comp = Competition.currentCompetition();
-    return new Instant(comp.getSimulationBaseTime().getMillis()
+    return Instant.ofEpochMilli(comp.getSimulationBaseTime().toEpochMilli()
                        + index * comp.getTimeslotDuration());
   }
 
   /**
    * Converts int timeslot index to DateTime in UTC timezone
    */
-  public DateTime getDateTimeForIndex (int index)
+  public ZonedDateTime getDateTimeForIndex (int index)
   {
     Competition comp = Competition.currentCompetition();
-    return new DateTime(comp.getSimulationBaseTime().getMillis()
-                        + index * comp.getTimeslotDuration(),
-                        DateTimeZone.UTC);
+    return ZonedDateTime.ofInstant(Instant.ofEpochMilli(comp.getSimulationBaseTime().toEpochMilli()
+                        + index * comp.getTimeslotDuration()),
+                        TimeService.utc);
   }
 
   @Override

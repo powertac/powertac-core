@@ -4,34 +4,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.time.Instant;
+import java.util.Map;
 
-import org.joda.time.Instant;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.repo.BrokerRepo;
 import org.powertac.common.repo.TimeslotRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
+import org.powertac.common.spring.SpringApplicationContext;
 import com.thoughtworks.xstream.XStream;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
 public class OrderTests
 {
-  @Autowired
-  private TimeslotRepo timeslotRepo;
-  
-  @Autowired
+  private TimeslotRepo timeslotRepo;  
   private BrokerRepo brokerRepo;
 
   private Broker broker;
@@ -51,12 +37,16 @@ public class OrderTests
   @BeforeEach
   public void setUp () throws Exception
   {
-    timeslotRepo.recycle();
-    brokerRepo.recycle();
+    timeslotRepo = new TimeslotRepo();
+    brokerRepo = new BrokerRepo();
+    Map<String, Object> appServices =
+            Map.of("timeslotRepo", timeslotRepo,
+                   "brokerRepo", brokerRepo);
+    SpringApplicationContext.setTestBeans(appServices);
     Competition.setCurrent(Competition.newInstance("market order test"));
     broker = new Broker("Sam");
     brokerRepo.add(broker);
-    now = Competition.currentCompetition().getSimulationBaseTime().plus(TimeService.DAY);
+    now = Competition.currentCompetition().getSimulationBaseTime().plusMillis(TimeService.DAY);
     timeslot = timeslotRepo.makeTimeslot(now);
     timeslotNum = timeslot.getSerialNumber();
   }
@@ -120,7 +110,8 @@ public class OrderTests
     
     Order xmo1 = (Order)xstream.fromXML(serialized.toString());
     assertNotNull(xmo1, "deserialized something");
-    assertEquals(broker, xmo1.getBroker(), "correct broker");
+    assertEquals(broker.getUsername(),
+                 xmo1.getBroker().getUsername(), "correct broker");
     assertEquals(timeslot, xmo1.getTimeslot(), "correct timeslot");
     assertEquals(0.5, xmo1.getMWh(), 1e-6, "correct quantity");
     assertEquals(-12.0, xmo1.getLimitPrice(), 1e-6, "correct price");
@@ -140,7 +131,8 @@ public class OrderTests
     
     Order xmo1 = (Order)xstream.fromXML(serialized.toString());
     assertNotNull(xmo1, "deserialized something");
-    assertEquals(broker, xmo1.getBroker(), "correct broker");
+    assertEquals(broker.getUsername(),
+                 xmo1.getBroker().getUsername(), "correct broker");
     assertEquals(timeslot, xmo1.getTimeslot(), "correct timeslot");
     assertEquals(0.5, xmo1.getMWh(), 1e-6, "correct quantity");
     assertNull(xmo1.getLimitPrice(), "null price");
@@ -186,7 +178,8 @@ public class OrderTests
     xstream.aliasSystemAttribute(null, "class");
     Order xmo1 = (Order)xstream.fromXML(xml);
     assertNotNull(xmo1, "deserialized something");
-    assertEquals(db, xmo1.getBroker(), "correct broker");
+    assertEquals(db.getUsername(),
+                 xmo1.getBroker().getUsername(), "correct broker");
     assertEquals(timeslot, xmo1.getTimeslot(), "correct timeslot");
     assertEquals(22.7, xmo1.getMWh(), 1e-6, "correct quantity");
     assertEquals(-70.0, xmo1.getLimitPrice(), 1e-6, "correct price");
@@ -227,11 +220,9 @@ public class OrderTests
   
   class DummyBroker extends Broker
   {
-
     public DummyBroker (String username, boolean local, boolean wholesale)
     {
       super(username, local, wholesale);
-    }
-    
+    } 
   }
 }

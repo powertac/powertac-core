@@ -18,6 +18,7 @@ package org.powertac.common.msg;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,29 +26,25 @@ import org.powertac.common.CustomerInfo;
 import org.powertac.common.XMLMessageConverter;
 import org.powertac.common.enumerations.PowerType;
 import org.powertac.common.repo.CustomerRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
+import org.powertac.common.spring.SpringApplicationContext;
 import com.thoughtworks.xstream.XStream;
 
 /**
  * Tests for CustomerBootstrapData. Note that this needs Spring dependency
  * injection, because the xml deserialization process requires autowiring.
+ * This is done using the setTestBeans() method.
+ * 
  * @author John Collins
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class CustomerBootstrapDataTests
 {
-  @Autowired
+  //@Autowired
   private CustomerRepo customerRepo;
   
   private CustomerInfo customer;
@@ -57,9 +54,13 @@ public class CustomerBootstrapDataTests
   @BeforeEach
   public void setUp () throws Exception
   {
+    customerRepo = new CustomerRepo();
     customer = customerRepo.createCustomerInfo("Population", 42);
     data = new double[] {1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.1,2.2,2.3,2.4,
                          2.5,2.6,2.7,2.8,2.9,3.0,3.1,3.2,3.3,3.4,3.5,3.6};
+    Map<String, Object> appServices =
+            Map.of("customerRepo", customerRepo);
+    SpringApplicationContext.setTestBeans(appServices);
   }
 
   @Test

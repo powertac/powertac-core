@@ -39,7 +39,12 @@ import org.springframework.stereotype.Service;
  * problems in a test environment, because if any test in a suite initializes
  * Spring, then later tests that do not initialize Spring can retrieve
  * instances from earlier tests, which may not be what the test expects.
- * This can lead to baffling problems.
+ * This can lead to baffling problems. To avoid this trap, it is best to NOT
+ * use Spring in a unit-test environment. Instead, at the top of a test that
+ * needs this service (it's usually not the test but something called by the
+ * test that needs it), add a call to setTestBeans with a map of bean-name
+ * to implementation (which may be a stub). This works for getBean(), but
+ * not for the other calls.
  * 
  * @author John Collins
  */
@@ -47,6 +52,8 @@ import org.springframework.stereotype.Service;
 public class SpringApplicationContext implements ApplicationContextAware
 {
   private static ApplicationContext context;
+  
+  private static Map testBeans;
   
   @Override
   public void setApplicationContext (ApplicationContext appContext)
@@ -62,8 +69,20 @@ public class SpringApplicationContext implements ApplicationContextAware
   {
     if (context != null)
       return context.getBean(beanName);
+    else if (null != testBeans) {
+      Object result = testBeans.get(beanName); 
+      return result;
+    }
     else
       return null;
+  }
+
+  /**
+   * Sets up the testBeans mapping
+   */
+  public static void setTestBeans (Map beanMap)
+  {
+    testBeans = beanMap;
   }
   
   /**

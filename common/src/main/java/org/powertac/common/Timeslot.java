@@ -16,9 +16,9 @@
 
 package org.powertac.common;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -64,7 +64,7 @@ public class Timeslot implements Comparable<Object>
   
   /** DateTime equivalent - lazy eval **/
   @XStreamOmitField
-  private DateTime startTime = null;
+  private ZonedDateTime startTime = null;
 
   /** 
    * Constructor is intended to be called by repository.
@@ -95,16 +95,16 @@ public class Timeslot implements Comparable<Object>
 
   public Instant getEndInstant ()
   {
-    return startInstant.plus(Competition.currentCompetition().getTimeslotDuration());
+    return startInstant.plusMillis(Competition.currentCompetition().getTimeslotDuration());
   }
   
   /**
    * Returns the DateTime representation of the start time for this timeslot
    */
-  public DateTime getStartTime ()
+  public ZonedDateTime getStartTime ()
   {
     if (null == startTime)
-      startTime = new DateTime(startInstant, DateTimeZone.UTC);
+      startTime = ZonedDateTime.ofInstant(startInstant, TimeService.utc);
     return startTime;
   }
   
@@ -114,7 +114,7 @@ public class Timeslot implements Comparable<Object>
    */
   public int slotInDay ()
   {
-    long millis = getStartTime().getMillisOfDay();
+    long millis = getStartInstant().getLong(ChronoField.MILLI_OF_DAY);
     return (int) (millis/Competition.currentCompetition().getTimeslotDuration());
   }
   
@@ -124,7 +124,7 @@ public class Timeslot implements Comparable<Object>
    */
   public int dayOfWeek ()
   {
-    return getStartTime().getDayOfWeek();
+    return getStartInstant().get(ChronoField.DAY_OF_WEEK);
   }
 
   @Override

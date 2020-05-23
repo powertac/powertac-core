@@ -184,13 +184,13 @@ public class Order extends XStreamStateLoggable
   }
   
   // access to TimeslotRepo
-  private static TimeslotRepo timeslotRepo;
+  //private static TimeslotRepo timeslotRepo;
   
   private static TimeslotRepo getTimeslotRepo()
   {
-    if (null == timeslotRepo) {
-      timeslotRepo = (TimeslotRepo) SpringApplicationContext.getBean("timeslotRepo");
-    }
-    return timeslotRepo;
+    //if (null == timeslotRepo) {
+    return (TimeslotRepo) SpringApplicationContext.getBean("timeslotRepo");
+    //}
+    //return timeslotRepo;
   }
 }

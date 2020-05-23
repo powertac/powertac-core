@@ -15,32 +15,34 @@
  */
 package org.powertac.common;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.StringWriter;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.enumerations.PowerType;
 import org.powertac.common.repo.BrokerRepo;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.powertac.common.repo.CustomerRepo;
+import org.powertac.common.repo.TariffRepo;
+import org.powertac.common.repo.TimeslotRepo;
+import org.powertac.common.spring.SpringApplicationContext;
 
 import com.thoughtworks.xstream.XStream;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class TariffTransactionTests
 {
-  TestContextManager f;
+  //TestContextManager f;
   Broker b1;
   BrokerRepo brokerRepo;
   TariffSpecification spec;
@@ -49,11 +51,21 @@ public class TariffTransactionTests
   @BeforeEach
   public void setUp() 
   {
-    brokerRepo = BrokerRepo.getInstance();
+    brokerRepo = new BrokerRepo();
     b1 = new Broker("bob");
     brokerRepo.add(b1);
     spec = new TariffSpecification(b1, PowerType.CONSUMPTION);
     customer = new CustomerInfo("Podunk", 42);
+    CustomerRepo customerRepo = new CustomerRepo();
+    customerRepo.add(customer);
+    TariffRepo tariffRepo = new TariffRepo();
+    TimeslotRepo timeslotRepo = new TimeslotRepo();
+    Map<String, Object> appServices =
+            Map.of("brokerRepo", brokerRepo,
+                   "customerRepo", customerRepo,
+                   "tariffRepo", tariffRepo,
+                   "timeslotRepo", timeslotRepo);
+    SpringApplicationContext.setTestBeans(appServices);
   }
 
   @Test
@@ -76,7 +88,7 @@ public class TariffTransactionTests
     xstream.processAnnotations(TariffTransaction.class);
     StringWriter serialized = new StringWriter();
     serialized.write(xstream.toXML(ttx));
-    //System.out.println(serialized.toString());
+    System.out.println(serialized.toString());
     TariffTransaction xttx = (TariffTransaction) xstream.fromXML(serialized.toString());
     assertNotNull(xttx, "deserialized something");
     assertEquals(TariffTransaction.Type.CONSUME, xttx.getTxType(), "correct type");

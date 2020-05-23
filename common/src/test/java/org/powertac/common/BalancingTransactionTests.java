@@ -18,17 +18,14 @@ package org.powertac.common;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
+import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.repo.BrokerRepo;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.powertac.common.spring.SpringApplicationContext;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -38,12 +35,12 @@ import com.thoughtworks.xstream.XStream;
  * @author John Collins
  *
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class BalancingTransactionTests
 {
   Instant baseTime;
@@ -54,11 +51,14 @@ public class BalancingTransactionTests
   public void setUp () throws Exception
   {
     Competition.setCurrent(Competition.newInstance("market order test"));
-    baseTime = Competition.currentCompetition().getSimulationBaseTime().plus(TimeService.DAY);
-    brokerRepo = BrokerRepo.getInstance();
+    baseTime = Competition.currentCompetition().getSimulationBaseTime().plusMillis(TimeService.DAY);
+    brokerRepo = new BrokerRepo();
     broker = new Broker("Sally");
     brokerRepo.add(broker);
-  }
+    Map<String, Object> appServices =
+            Map.of("brokerRepo", brokerRepo);
+    SpringApplicationContext.setTestBeans(appServices);
+    }
 
   @Test
   public void testBalancingTransaction ()

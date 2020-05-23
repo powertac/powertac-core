@@ -18,33 +18,25 @@ package org.powertac.common;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.List;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.enumerations.PowerType;
 import org.powertac.common.repo.BrokerRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
 import com.thoughtworks.xstream.XStream;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class TariffSpecificationTests
 {
-  @Autowired
+  //@Autowired
   private TimeService timeService;
   
   private Broker broker;
@@ -53,7 +45,13 @@ public class TariffSpecificationTests
   @BeforeEach
   public void setUp () throws Exception
   {
-    timeService.setCurrentTime(new DateTime());
+    Instant start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    timeService =
+            new TimeService(start.toEpochMilli(),
+                            ZonedDateTime.now(TimeService.utc).toInstant().toEpochMilli(),
+                            360,
+                            15*60*1000);
+    timeService.setCurrentTime(ZonedDateTime.now());
     now = timeService.getCurrentTime();
     broker = new Broker("Jenny");
     BrokerRepo repo = new BrokerRepo();
@@ -80,9 +78,11 @@ public class TariffSpecificationTests
   public void testSetExpiration ()
   {
     TariffSpecification spec = new TariffSpecification(broker, PowerType.CONSUMPTION);
-    Instant exp = now.plus(TimeService.HOUR * 24);
+    Instant exp = now.plusMillis(TimeService.HOUR * 24);
     assertEquals(spec, spec.withExpiration(exp), "correct return");
-    assertEquals(exp, spec.getExpiration(), "correct value");
+    assertEquals(exp.toEpochMilli(),
+                 spec.getExpiration().toEpochMilli(),
+                 "correct value");
   }
 
   @Test
@@ -176,21 +176,22 @@ public class TariffSpecificationTests
   public void testXmlSerialization ()
   {
     Rate r = new Rate().withValue(-0.121).
-            withDailyBegin(new DateTime(2011, 1, 1, 6, 0, 0, 0, DateTimeZone.UTC)).
-            withDailyEnd(new DateTime(2011, 1, 1, 8, 0, 0, 0, DateTimeZone.UTC)).
+            withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc)).
+            withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc)).
             withTierThreshold(100.0);
     RegulationRate rr = new RegulationRate().
             withUpRegulationPayment(.05).
             withDownRegulationPayment(-.05).
             withResponse(RegulationRate.ResponseTime.SECONDS);
     Instant now = timeService.getCurrentTime();
+    Instant exp = now.plusMillis(TimeService.DAY * 2);
     TariffSpecification spec = 
             new TariffSpecification(broker,
                                     PowerType.CONSUMPTION).
                                     withMinDuration(20000l).
                                     withSignupPayment(35.0).
                                     withPeriodicPayment(-0.05).
-                                    withExpiration(now.plus(TimeService.DAY * 2)).
+                                    withExpiration(exp).
                                     addSupersedes(42l).
                                     addRate(r).
                                     addRate(rr);
@@ -208,7 +209,9 @@ public class TariffSpecificationTests
     assertNotNull(supersedes, "non-empty supersedes list");
     assertEquals(1, supersedes.size(), "one entry");
     assertEquals(42l, supersedes.get(0).longValue(), "correct entry");
-    assertEquals(now.plus(TimeService.DAY * 2), xspec.getExpiration(), "correct expiration");
+    assertEquals(exp.toEpochMilli(),
+                 xspec.getExpiration().toEpochMilli(),
+                 "correct expiration");
     Rate xr = (Rate)xspec.getRates().get(0);
     assertNotNull(xr, "rate present");
     assertTrue(xr.isFixed(), "correct rate type");

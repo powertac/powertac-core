@@ -18,18 +18,14 @@ package org.powertac.common;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
+import java.util.Map;
 
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.repo.BrokerRepo;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestContextManager;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
+import org.powertac.common.repo.TimeslotRepo;
+import org.powertac.common.spring.SpringApplicationContext;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -37,27 +33,32 @@ import com.thoughtworks.xstream.XStream;
  * requires that the BrokerConverter be able to find the BrokerRepo.
  * @author John Collins
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class DistributionTransactionTests
 {
-  TestContextManager f;
+  //TestContextManager f;
   Instant baseTime;
   Broker broker;
   BrokerRepo brokerRepo;
+  TimeslotRepo timeslotRepo;
 
   @BeforeEach
   public void setUp () throws Exception
   {
     Competition.setCurrent(Competition.newInstance("distribution transaction test"));
-    baseTime = Competition.currentCompetition().getSimulationBaseTime().plus(TimeService.DAY);
-    brokerRepo = BrokerRepo.getInstance();
+    baseTime = Competition.currentCompetition().getSimulationBaseTime().plusMillis(TimeService.DAY);
+    brokerRepo = new BrokerRepo();
     broker = new Broker("Sally");
     brokerRepo.add(broker);
+    timeslotRepo = new TimeslotRepo();
+    Map<String, Object> appServices =
+            Map.of("brokerRepo", brokerRepo, "timeslotRepo", timeslotRepo);
+    SpringApplicationContext.setTestBeans(appServices);
   }
 
   @Test

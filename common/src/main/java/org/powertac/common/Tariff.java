@@ -15,6 +15,9 @@
  */
 package org.powertac.common;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,11 +28,8 @@ import java.util.TreeSet;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.powertac.common.enumerations.PowerType;
-import org.powertac.common.msg.MarketBootstrapData;
+//import org.powertac.common.msg.MarketBootstrapData;
 import org.powertac.common.repo.TariffRepo;
 import org.powertac.common.spring.SpringApplicationContext;
 import org.powertac.common.state.Domain;
@@ -297,7 +297,7 @@ public class Tariff
     
     // Next, we need to explore the rate structure. This starts with
     // the time index
-    int di = getTimeIndex(timeService.getCurrentTime());
+    int di = getTimeIndex(timeService.getCurrentDateTime());
         
     // Then work out the tier index. Keep in mind that the kwh value could
     // cross a tier boundary
@@ -449,7 +449,7 @@ public class Tariff
   {
     double result = 0.0;
     // first, get the time index
-    int di = getTimeIndex(when);
+    int di = getTimeIndex(ZonedDateTime.ofInstant(when, TimeService.utc));
     
     // next, adjust the sign of the result. Production is kwh<0, and rate>0.
     // Consumption is kwh>0 and rate<0. If we multiply them, we get the same
@@ -490,12 +490,11 @@ public class Tariff
     return kwh;
   }
 
-  private int getTimeIndex (Instant when)
+  private int getTimeIndex (ZonedDateTime when)
   {
-    DateTime dt = new DateTime(when, DateTimeZone.UTC);
-    int di = dt.getHourOfDay();
+    int di = when.get(ChronoField.HOUR_OF_DAY);
     if (isWeekly)
-      di += 24 * (dt.getDayOfWeek() - 1);
+      di += 24 * (when.get(ChronoField.DAY_OF_WEEK) - 1);
     return di;
   }
 

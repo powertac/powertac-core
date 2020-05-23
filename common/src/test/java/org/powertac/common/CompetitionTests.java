@@ -3,27 +3,23 @@ package org.powertac.common;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
 import com.thoughtworks.xstream.XStream;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class CompetitionTests
 {
 
@@ -103,14 +99,14 @@ public class CompetitionTests
     assertEquals(c1, cx, "correct return");
     assertEquals(3, c1.getDeactivateTimeslotsAhead(), "new count");
   }
-
   @Test
   public void testSetSimulationBaseTime ()
   {
     Competition c1 = Competition.newInstance("c1");
-    Instant base = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).toInstant();
+    Instant base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
-    Instant newBase = base.plus(TimeService.DAY);
+    Instant newBase = base.plusMillis(TimeService.DAY);
     Competition cx = c1.withSimulationBaseTime(newBase);
     assertEquals(c1, cx, "correct return");
     assertEquals(newBase, c1.getSimulationBaseTime(), "new base");
@@ -120,36 +116,71 @@ public class CompetitionTests
   public void testSetSimulationBaseTimeLong ()
   {
     Competition c1 = Competition.newInstance("c1");
-    Instant base = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).toInstant();
+    Instant base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
-    long newBase = base.plus(TimeService.DAY).getMillis();
+    long newBase = base.plusMillis(TimeService.DAY).toEpochMilli();
     Competition cx = c1.withSimulationBaseTime(newBase);
     assertEquals(c1, cx, "correct return");
-    assertEquals(newBase, c1.getSimulationBaseTime().getMillis(), "new base");
+    assertEquals(newBase, c1.getSimulationBaseTime().toEpochMilli(), "new base");
+  }
+
+  @Test
+  public void testYMDParse ()
+  {
+    Instant bt = ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+    String day = "2010-06-22T00:00:00";
+    try {
+      DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+      LocalDateTime base = LocalDateTime.parse(day, fmt);
+    } catch (DateTimeParseException dtp) {
+      System.out.println("Cannot parse " + dtp.getParsedString()
+                         + " at " + dtp.getErrorIndex());
+      fail();
+    }
   }
 
   @Test
   public void testSetSimulationBaseTimeYmd ()
   {
     Competition c1 = Competition.newInstance("c1");
-    Instant base = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).toInstant();
+    Instant base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     String newBase = "2010-06-22";
     Competition cx = c1.withSimulationBaseTime(newBase);
     assertEquals(c1, cx, "correct return");
-    assertEquals(base.plus(TimeService.DAY).getMillis(), c1.getSimulationBaseTime().getMillis(), "new base");
+    assertEquals(base.plusMillis(TimeService.DAY).toEpochMilli(),
+                 c1.getSimulationBaseTime().toEpochMilli(), "new base");
+  }
+
+  @Test
+  public void testSetSimulationBaseTimeYmdhms ()
+  {
+    Competition c1 = Competition.newInstance("c1");
+    Instant base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+    assertEquals(base, c1.getSimulationBaseTime(), "default base");
+    String newBase = "2010-06-22T00:00:00";
+    Competition cx = c1.withSimulationBaseTime(newBase);
+    assertEquals(c1, cx, "correct return");
+    assertEquals(base.plusMillis(TimeService.DAY).toEpochMilli(),
+                 c1.getSimulationBaseTime().toEpochMilli(), "new base");
   }
 
   @Test
   public void testSetSimulationBaseTimeString ()
   {
     Competition c1 = Competition.newInstance("c1");
-    Instant base = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).toInstant();
+    Instant base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
-    String newBase = Long.toString(base.plus(TimeService.DAY).getMillis());
+    String newBase =
+            Long.toString(base.plusMillis(TimeService.DAY).toEpochMilli());
     Competition cx = c1.withSimulationBaseTime(newBase);
     assertEquals(c1, cx, "correct return");
-    assertEquals(base.plus(TimeService.DAY).getMillis(), c1.getSimulationBaseTime().getMillis(), "new base");
+    assertEquals(base.plusMillis(TimeService.DAY).toEpochMilli(),
+                 c1.getSimulationBaseTime().toEpochMilli(), "new base");
   }
 
   @Test
@@ -175,7 +206,8 @@ public class CompetitionTests
   @Test
   public void testGetClockParams ()
   {
-    long base = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).getMillis();
+    long base =
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant().toEpochMilli();
     long rate = 300l;
     long modulo = 30*60000l;
     Competition c1 = Competition.newInstance("c1")

@@ -19,21 +19,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.StringWriter;
+import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.util.SortedSet;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.repo.TimeslotRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -41,15 +36,14 @@ import com.thoughtworks.xstream.XStream;
  * Tests both Orderbook and OrderbookEntry
  * @author John Collins
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class OrderbookTests
 {
-  @Autowired
   private TimeslotRepo timeslotRepo;
 
   private Competition competition;
@@ -68,17 +62,19 @@ public class OrderbookTests
   @BeforeEach
   public void setUp () throws Exception
   {
+    timeslotRepo = new TimeslotRepo();
     timeslotRepo.recycle();
     competition = Competition.newInstance("market order test");
-    now = new DateTime(2011, 10, 10, 12, 0, 0, 0, DateTimeZone.UTC).toInstant();
+    now = ZonedDateTime.of(2011, 10, 10, 12, 0, 0, 0, TimeService.utc).toInstant();
     timeslotRepo.makeTimeslot(now);
-    timeslot = timeslotRepo.makeTimeslot(now.plus(competition.getTimeslotDuration()));
+    timeslot = timeslotRepo.makeTimeslot(now.plusMillis(competition.getTimeslotDuration()));
   }
 
   @Test
   public void testOrderbookEmpty ()
   {
     Orderbook ob = new Orderbook(timeslot, null, now);
+    ReflectionTestUtils.setField(ob, "timeslotRepo", timeslotRepo);
     assertNotNull(ob, "non-null orderbook");
     assertEquals(timeslot, ob.getTimeslot(), "correct timeslot");
     assertEquals(now, ob.getDateExecuted(), "correct time");
@@ -89,6 +85,7 @@ public class OrderbookTests
   public void testOrderbook ()
   {
     Orderbook ob = new Orderbook(timeslot, 22.1, now);
+    ReflectionTestUtils.setField(ob, "timeslotRepo", timeslotRepo);
     assertNotNull(ob, "non-null orderbook");
     assertEquals(timeslot, ob.getTimeslot(), "correct timeslot");
     assertEquals(now, ob.getDateExecuted(), "correct time");
@@ -135,6 +132,7 @@ public class OrderbookTests
       .addBid(new OrderbookOrder(5.6, -19.4))
       .addBid(new OrderbookOrder(6.2, null))
       .addAsk(new OrderbookOrder(-3.1, 23.4));
+    ReflectionTestUtils.setField(ob1, "timeslotRepo", timeslotRepo);
     XStream xstream = XMLMessageConverter.getXStream();
     xstream.processAnnotations(Orderbook.class);
     xstream.processAnnotations(Timeslot.class);
@@ -143,6 +141,7 @@ public class OrderbookTests
     //System.out.println(serialized.toString());
     
     Orderbook xob1 = (Orderbook)xstream.fromXML(serialized.toString());
+    ReflectionTestUtils.setField(xob1, "timeslotRepo", timeslotRepo);
     assertNotNull(xob1, "deserialized something");
     assertEquals(timeslot, xob1.getTimeslot(), "correct timeslot");
     assertEquals(22.1, xob1.getClearingPrice(), 1e-6, "correct clearing price");
@@ -163,6 +162,7 @@ public class OrderbookTests
     
     Orderbook xob1 = (Orderbook)xstream.fromXML(serialized.toString());
     assertNotNull(xob1, "deserialized something");
+    ReflectionTestUtils.setField(xob1, "timeslotRepo", timeslotRepo);
     assertEquals(timeslot, xob1.getTimeslot(), "correct timeslot");
     assertEquals(22.1, xob1.getClearingPrice(), 1e-6, "correct clearing price");
     assertNotNull(xob1.getBids().size(), "bids");

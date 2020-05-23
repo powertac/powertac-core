@@ -58,11 +58,11 @@ public class BrokerConverter implements SingleValueConverter
     if (brokerRepo == null) {
       brokerRepo = (BrokerRepo) SpringApplicationContext.getBean("brokerRepo");
     }
-    if (brokerRepo == null) {
-      // get here if no Spring context
-      log.warn("no autowire BrokerRepo - using singleton");
-      brokerRepo = BrokerRepo.getInstance();
-    }
+//    if (brokerRepo == null) {
+//      // get here if no Spring context
+//      log.warn("no autowire BrokerRepo - using singleton");
+//      brokerRepo = BrokerRepo.getInstance();
+//    }
     return brokerRepo.findOrCreateByUsername(username);
   }
 

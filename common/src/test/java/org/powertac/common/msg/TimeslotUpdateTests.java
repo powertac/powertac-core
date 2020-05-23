@@ -18,9 +18,9 @@ package org.powertac.common.msg;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.List;
 
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.Competition;
@@ -51,7 +51,7 @@ public class TimeslotUpdateTests
     timeslotRepo = new TimeslotRepo();
     ReflectionTestUtils.setField(timeslotRepo, "timeService", timeService);
     for (int i = 0; i < 15; i++) {
-      timeslotRepo.makeTimeslot(start.plus(TimeService.HOUR * i));
+      timeslotRepo.makeTimeslot(start.plusMillis(TimeService.HOUR * i));
     }
 
   }

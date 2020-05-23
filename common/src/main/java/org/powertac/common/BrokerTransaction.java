@@ -15,7 +15,8 @@
  */
 package org.powertac.common;
 
-import org.joda.time.Instant;
+import java.time.Instant;
+
 import org.powertac.common.repo.TimeslotRepo;
 import org.powertac.common.spring.SpringApplicationContext;
 import org.powertac.common.state.XStreamStateLoggable;
@@ -37,7 +38,7 @@ public abstract class BrokerTransaction extends XStreamStateLoggable
   @XStreamConverter(BrokerConverter.class)
   protected Broker broker;
 
-  /** The timeslot for which this meter reading is generated */
+  /** The timeslot for which this transaction applies */
   @XStreamAsAttribute
   protected int postedTimeslot;
   

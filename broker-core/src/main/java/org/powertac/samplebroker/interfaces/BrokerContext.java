@@ -15,9 +15,9 @@
  */
 package org.powertac.samplebroker.interfaces;
 
+import java.time.Instant;
 import java.util.List;
 
-import org.joda.time.Instant;
 import org.powertac.common.Broker;
 
 /**

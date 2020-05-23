@@ -17,25 +17,24 @@ package org.powertac.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.enumerations.PowerType;
+import org.powertac.common.repo.BrokerRepo;
 import org.powertac.common.repo.CustomerRepo;
+import org.powertac.common.spring.SpringApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class XMLMessageConverterTests 
 {
   private static final Log log = LogFactory.getLog(XMLMessageConverterTests.class);
@@ -74,6 +73,10 @@ public class XMLMessageConverterTests
 
   @Test
   public void testFullCustomerConverter() {
+    CustomerRepo customerRepo = new CustomerRepo();
+    Map<String, Object> appServices =
+            Map.of("customerRepo", customerRepo);
+    SpringApplicationContext.setTestBeans(appServices);
     Competition competition = Competition.newInstance("test");
     competition.addBroker("broker 1");
     

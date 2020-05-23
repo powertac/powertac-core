@@ -3,38 +3,36 @@ package org.powertac.common.msg;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringWriter;
+import java.time.Instant;
+import java.util.Map;
 
-import org.joda.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powertac.common.*;
 import org.powertac.common.enumerations.PowerType;
+import org.powertac.common.repo.BrokerRepo;
 import org.powertac.common.repo.TariffRepo;
 import org.powertac.common.repo.TimeslotRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-
+import org.powertac.common.spring.SpringApplicationContext;
 import com.thoughtworks.xstream.XStream;
 
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class ControlEventTest
 {
-  @Autowired
+  //@Autowired
   private TariffRepo tariffRepo;
 
-  @Autowired
+  //@Autowired
   private TimeslotRepo timeslotRepo;
+  
+  private BrokerRepo brokerRepo;
 
-  @Autowired
+  //@Autowired
   private TimeService timeService;
 
   private Broker broker;
@@ -43,13 +41,21 @@ public class ControlEventTest
   @BeforeEach
   public void setUp () throws Exception
   {
-    tariffRepo.recycle();
-    timeslotRepo.recycle();
+    timeService = new TimeService();
+    tariffRepo = new TariffRepo();
+    timeslotRepo = new TimeslotRepo();
+    brokerRepo = new BrokerRepo();
+    Map<String, Object> appServices =
+            Map.of("timeService", timeService,
+                   "tariffRepo", tariffRepo,
+                   "timeslotRepo", timeslotRepo,
+                   "brokerRepo", brokerRepo);
+    SpringApplicationContext.setTestBeans(appServices);
     Competition.newInstance("test");
     broker = new Broker("Jenny");
     spec = new TariffSpecification(broker, PowerType.INTERRUPTIBLE_CONSUMPTION);
     tariffRepo.addSpecification(spec);
-    Instant baseTime = new Instant();
+    Instant baseTime = Instant.now();
     timeService.setCurrentTime(baseTime);
     timeslotRepo.makeTimeslot(baseTime);
   }

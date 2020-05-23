@@ -15,10 +15,10 @@
  */
 package org.powertac.common;
 
+import java.time.Instant;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.joda.time.Instant;
 import org.powertac.common.repo.TimeslotRepo;
 import org.powertac.common.spring.SpringApplicationContext;
 import org.powertac.common.state.ChainedConstructor;

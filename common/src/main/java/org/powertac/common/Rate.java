@@ -15,20 +15,16 @@
  */
 package org.powertac.common;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeFieldType;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.ReadablePartial;
-import org.joda.time.base.AbstractDateTime;
-import org.joda.time.base.AbstractInstant;
 import org.powertac.common.enumerations.PowerType;
 import org.powertac.common.spring.SpringApplicationContext;
 import org.powertac.common.state.Domain;
@@ -154,35 +150,35 @@ public class Rate extends RateCore
   {
     super();
     rateHistory = new TreeSet<HourlyCharge>();
-    probe = new ProbeCharge(new Instant(0l), 0.0);
+    probe = new ProbeCharge(Instant.ofEpochMilli(0l), 0.0);
   }
 
   /**
    * Sets the day of the week on which this Rate comes into effect. The
    * {@code begin} parameter is processed to extract the dayOfWeek field.
    */
-  public Rate withWeeklyBegin (AbstractDateTime begin)
+  public Rate withWeeklyBegin (ZonedDateTime begin)
   {
     if (null == begin) {
       log.error("Null value for weeklyBegin");
       weeklyBegin = NO_TIME;
       return null;
     }
-    return withWeeklyBegin(begin.getDayOfWeek());
+    return withWeeklyBegin(begin.get(ChronoField.DAY_OF_WEEK));
   }
 
   /**
    * Sets the day of the week on which this Rate comes into effect.
    * Process begin spec to extract dayOfWeek field
    */
-  public Rate withWeeklyBegin (ReadablePartial begin)
+  public Rate withWeeklyBegin (Instant begin)
   {
     if (null == begin) {
       log.error("Null value for weeklyBegin");
       weeklyBegin = NO_TIME;
-      return null;
+      return this;
     }
-    return withWeeklyBegin(begin.get(DateTimeFieldType.dayOfWeek()));
+    return withWeeklyBegin(ZonedDateTime.ofInstant(begin, TimeService.utc));
   }
 
   /**
@@ -197,7 +193,7 @@ public class Rate extends RateCore
     if (begin < MIN_DAY || begin > MAX_DAY) {
       log.error("Invalid value {} for weeklyBegin", begin);
       weeklyBegin = NO_TIME;
-      return null;
+      return this;
     }
     weeklyBegin = begin;
     return this;
@@ -212,23 +208,23 @@ public class Rate extends RateCore
    * Sets the weekly end of applicability for this Rate,
    * by processing end spec to extract dayOfWeek field.
    */
-  public Rate withWeeklyEnd (AbstractDateTime end)
+  public Rate withWeeklyEnd (ZonedDateTime end)
   {
     if (null == end) {
       log.error("Null value for weeklyEnd");
       weeklyEnd = NO_TIME;
     }
-    return withWeeklyEnd(end.getDayOfWeek());
+    return withWeeklyEnd(end.get(ChronoField.DAY_OF_WEEK));
   }
 
   /**
    * Sets the weekly end of applicability for this Rate,
    * by processing end spec to extract dayOfWeek field.
    */
-  public Rate withWeeklyEnd (ReadablePartial end)
+  public Rate withWeeklyEnd (Instant end)
   {
-    if (end!= null) {
-      return withWeeklyEnd(end.get(DateTimeFieldType.dayOfWeek()));
+    if (end != null) {
+      return withWeeklyEnd(ZonedDateTime.ofInstant(end, TimeService.utc));
     }
     return this;
   }
@@ -259,27 +255,27 @@ public class Rate extends RateCore
   /**
    * Sets the time of day when this Rate comes into effect.
    */
-  public Rate withDailyBegin (AbstractDateTime begin)
+  public Rate withDailyBegin (ZonedDateTime begin)
   {
     if (null == begin) {
       log.error("Null value for dailyBegin");
       dailyBegin = NO_TIME;
       return null;
     }
-    return withDailyBegin(begin.getHourOfDay());
+    return withDailyBegin(begin.get(ChronoField.HOUR_OF_DAY));
   }
 
   /**
    * Sets the time of day when this Rate comes into effect.
    */
-  public Rate withDailyBegin (ReadablePartial begin)
+  public Rate withDailyBegin (Instant begin)
   {
     if (null == begin) {
       log.error("Null value for dailyBegin");
       dailyBegin = NO_TIME;
       return null;
     }
-    return withDailyBegin(begin.get(DateTimeFieldType.hourOfDay()));
+    return withDailyBegin(ZonedDateTime.ofInstant(begin, TimeService.utc));
   }
 
   /**
@@ -308,27 +304,27 @@ public class Rate extends RateCore
   /**
    * Sets the time of day when this Rate is no longer in effect.
    */
-  public Rate withDailyEnd (AbstractDateTime end)
+  public Rate withDailyEnd (ZonedDateTime end)
   {
     if (null == end) {
       log.error("Null value for dailyEnd");
       dailyEnd = NO_TIME;
-      return null;
+      return this;
     }
-    return withDailyEnd(end.getHourOfDay());
+    return withDailyEnd(end.get(ChronoField.HOUR_OF_DAY));
   }
 
   /**
    * Sets the time of day when this Rate is no longer in effect.
    */
-  public Rate withDailyEnd (ReadablePartial end)
+  public Rate withDailyEnd (Instant end)
   {
     if (null == end) {
       log.error("Null value for dailyEnd");
       dailyEnd = NO_TIME;
-      return null;
+      return this;
     }
-    return withDailyEnd(end.get(DateTimeFieldType.hourOfDay()));
+    return withDailyEnd(ZonedDateTime.ofInstant(end, TimeService.utc));
   }
 
   /**
@@ -341,7 +337,7 @@ public class Rate extends RateCore
     if (end < MIN_HOUR | end > MAX_HOUR) {
       log.error("invalid value {} for dailyEnd", end);
       dailyEnd = NO_TIME;
-      return null;
+      return this;
     }
     dailyEnd = end;
     return this;
@@ -359,7 +355,7 @@ public class Rate extends RateCore
   public Rate withNoticeInterval (Duration interval)
   {
     // we assume that integer division will do the Right Thing here
-    return withNoticeInterval(interval.getMillis() / TimeService.HOUR);
+    return withNoticeInterval(interval.getSeconds() / 3600);
   }
 
   /**
@@ -406,7 +402,7 @@ public class Rate extends RateCore
     else {
       Instant now = getCurrentTime();
       double sgn = Math.signum(maxValue);
-      long warning = newCharge.getAtTime().getMillis() - now.getMillis();
+      long warning = newCharge.getAtTime().toEpochMilli() - now.toEpochMilli();
       if (warning < noticeInterval * TimeService.HOUR && !publish) {
         // too late
         log.warn("Too late (" + now.toString() + ") to change rate for " + newCharge.getAtTime().toString());
@@ -421,10 +417,10 @@ public class Rate extends RateCore
       }
       else {
         if (probe == null) {
-          probe = new ProbeCharge(new Instant(0l), 0.0);
+          probe = new ProbeCharge(Instant.ofEpochMilli(0l), 0.0);
         }
         // first, remove the existing charge for the specified time
-        probe.setAtTime(newCharge.getAtTime().plus(1000l));
+        probe.setAtTime(newCharge.getAtTime().plusMillis(1000l));
         //HourlyCharge probe = new HourlyCharge(newCharge.getAtTime().plus(1000l), 0);
         SortedSet<HourlyCharge> head = rateHistory.headSet(probe);
         if (head != null && head.size() > 0) {
@@ -577,14 +573,14 @@ public class Rate extends RateCore
    * True just in case this Rate applies at the given DateTime, ignoring the
    * tier.
    */
-  public boolean applies (AbstractInstant when)
+  public boolean applies (Instant when)
   {
     boolean appliesWeekly = false;
     boolean appliesDaily = false;
-    DateTime time = new DateTime(when, DateTimeZone.UTC);
+    ZonedDateTime time = ZonedDateTime.ofInstant(when, TimeService.utc);
 
     // check weekly applicability
-    int day = time.getDayOfWeek();
+    int day = time.get(ChronoField.DAY_OF_WEEK);
     if (weeklyBegin == NO_TIME || weeklyEnd == NO_TIME) {
       appliesWeekly = true;
     }
@@ -596,7 +592,7 @@ public class Rate extends RateCore
     }
 
     // check daily applicability
-    int hour = time.getHourOfDay();
+    int hour = time.get(ChronoField.HOUR_OF_DAY);
     if (dailyBegin == NO_TIME || dailyEnd == NO_TIME) {
       appliesDaily = true;
     }
@@ -625,7 +621,7 @@ public class Rate extends RateCore
    * True just in case this Rate applies at the specified
    * time, for the indicated usage tier.
    */
-  public boolean applies (double usage, AbstractInstant when)
+  public boolean applies (double usage, Instant when)
   {
     if (usage >= tierThreshold) {
       return applies(when);
@@ -660,7 +656,7 @@ public class Rate extends RateCore
   /**
    * Shortcut to get value at an instant without a TEH.
    */
-  public double getValue (AbstractInstant when)
+  public double getValue (Instant when)
   {
     return getValue(when, null);
   }
@@ -673,7 +669,7 @@ public class Rate extends RateCore
    * there is not an HourlyCharge for the requested timeslot, then 
    * the helper is used to produce the value. 
    */
-  public double getValue (AbstractInstant when,
+  public double getValue (Instant when,
                           TariffEvaluationHelper helper)
   {
     if (fixed)
@@ -687,19 +683,19 @@ public class Rate extends RateCore
     }
     else {
       if (probe == null) {
-        probe = new ProbeCharge(new Instant(0l), 0.0);
+        probe = new ProbeCharge(Instant.ofEpochMilli(0l), 0.0);
       }
-      Instant inst = new Instant(when);
+      Instant inst = Instant.from(when);
       // return the most recent price announcement for the given time
-      probe.setAtTime(inst.plus(1000l));
+      probe.setAtTime(inst.plusMillis(1000l));
       SortedSet<HourlyCharge> head = rateHistory.headSet(probe);
       if (head == null || head.size() == 0) {
-        log.debug("No hourly charge found for " + when.getMillis() + ", returning default");
+        log.debug("No hourly charge found for " + when.toEpochMilli() + ", returning default");
         return expectedMean; // default
       }
       else {
         HourlyCharge candidate = head.last();
-        if (candidate.getAtTime().getMillis() == inst.getMillis()) {
+        if (candidate.getAtTime().toEpochMilli() == inst.toEpochMilli()) {
           return candidate.getValue();
         }
         else {

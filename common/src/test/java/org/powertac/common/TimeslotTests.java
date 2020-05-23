@@ -2,7 +2,8 @@ package org.powertac.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.joda.time.Instant;
+import java.time.Instant;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +28,9 @@ public class TimeslotTests
   @Test
   public void testTimeslotPrev ()
   {
-    Timeslot ts2 = new Timeslot(2, 
-                                new Instant(baseTime.getMillis() + TimeService.HOUR));
+    Timeslot ts2 =
+            new Timeslot(2, Instant.ofEpochMilli(baseTime.toEpochMilli()
+                                                 + TimeService.HOUR));
     assertNotNull(ts2, "not null");
   }
 

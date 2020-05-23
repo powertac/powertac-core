@@ -43,7 +43,7 @@ public class BrokerRepo implements DomainRepo
     super();
     nameTable = new HashMap<String, Broker>();
     idTable = new HashMap<Long, Broker>();
-    instance = this; // testing support
+    //instance = this; // testing support
   }
   
   public void add (Broker broker)
@@ -131,12 +131,12 @@ public class BrokerRepo implements DomainRepo
 
   // testing support - keep a singleton instance around for cases
   // where autowiring does not work.
-  private static BrokerRepo instance;
-  
-  public static BrokerRepo getInstance ()
-  {
-    if (null == instance)
-      instance = new BrokerRepo();
-    return instance;
-  }
+//  private static BrokerRepo instance;
+//  
+//  public static BrokerRepo getInstance ()
+//  {
+//    if (null == instance)
+//      instance = new BrokerRepo();
+//    return instance;
+//  }
 }

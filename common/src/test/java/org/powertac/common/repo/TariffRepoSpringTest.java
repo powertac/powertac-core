@@ -17,6 +17,8 @@ package org.powertac.common.repo;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,31 +29,28 @@ import org.powertac.common.Tariff;
 import org.powertac.common.TariffSpecification;
 import org.powertac.common.TimeService;
 import org.powertac.common.enumerations.PowerType;
+import org.powertac.common.spring.SpringApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestExecutionListeners;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 /**
  * TariffRepo tests that need the Spring context to run. Basically, it's
  * tests that need to init Tariffs.
  * @author John Collins
  */
-@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
-@DirtiesContext
-@TestExecutionListeners(listeners = {
-  DependencyInjectionTestExecutionListener.class,
-  DirtiesContextTestExecutionListener.class
-})
+//@SpringJUnitConfig(locations = {"classpath:test-config.xml"})
+//@DirtiesContext
+//@TestExecutionListeners(listeners = {
+//  DependencyInjectionTestExecutionListener.class,
+//  DirtiesContextTestExecutionListener.class
+//})
 public class TariffRepoSpringTest
 {
   //@Autowired
   //private TimeService timeService; // dependency injection
 
-  @Autowired
+  //@Autowired
   private TariffRepo repo;
+  private TimeService timeService;
 
   TariffSpecification spec;
   Tariff tariff;
@@ -62,7 +61,8 @@ public class TariffRepoSpringTest
   public void setUp () throws Exception
   {
     Competition.newInstance("test");
-    repo.recycle();
+    repo = new TariffRepo();
+    timeService = new TimeService();
     broker = new Broker("Sally");
     rate = new Rate().withValue(-0.121);
     spec = new TariffSpecification(broker, PowerType.CONSUMPTION)
@@ -83,6 +83,10 @@ public class TariffRepoSpringTest
   @Test
   public void testSetGetDefault ()
   {
+    Map<String, Object> appServices =
+            Map.of("tariffRepo", repo,
+                   "timeService", timeService);
+    SpringApplicationContext.setTestBeans(appServices);
     Tariff result = repo.getDefaultTariff(PowerType.CONSUMPTION);
     assertNull(result, "no default tariff yet");
 

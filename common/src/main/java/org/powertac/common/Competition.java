@@ -16,16 +16,17 @@
 
 package org.powertac.common;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.powertac.common.config.ConfigurableValue;
 import org.powertac.common.msg.MarketBootstrapData;
 import org.powertac.common.state.Domain;
@@ -37,6 +38,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import com.thoughtworks.xstream.converters.time.InstantConverter;
 
 
 /**
@@ -121,8 +123,10 @@ public class Competition //implements Serializable
   private double estimatedConsumptionPremium = 2.0;
 
   /** the start time of the simulation scenario, in sim time. */
-  @XStreamAsAttribute
-  private Instant simulationBaseTime = new DateTime(2010, 6, 21, 0, 0, 0, 0, DateTimeZone.UTC).toInstant();
+  //@XStreamAsAttribute
+  @XStreamConverter(InstantConverter.class)
+  private Instant simulationBaseTime =
+    ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
 
   /** timezone offset for scenario locale */
   @XStreamAsAttribute
@@ -534,7 +538,8 @@ public class Competition //implements Serializable
 
   /**
    * Fluent setter for simulation base time that takes a String, interpreted
-   * as a standard DateTimeFormat as yyyy-MM-dd. If that fails, try to parse
+   * as a standard DateFormat as yyyy-MM-dd or the standard DateTimeFormat as
+   * yyyy-MM-ddThh:mm:ss. If that fails, try to parse
    * the string as a regular (long) timestamp.
    */
   @ConfigurableValue(valueType = "String",
@@ -543,12 +548,25 @@ public class Competition //implements Serializable
   {
     Instant instant;
     try {
-      DateTimeZone.setDefault(DateTimeZone.UTC);
-      DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
-      instant = fmt.parseDateTime(baseTime).toInstant();
-    } catch (IllegalArgumentException e) {
-      // Try to interpret the string as a long timestamp instead
-      instant = new Instant(Long.parseLong(baseTime));
+      DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE_TIME;
+      LocalDateTime base = LocalDateTime.parse(baseTime, fmt);
+      instant = base.atZone(TimeService.utc).toInstant();
+    } catch (DateTimeParseException dtp) {
+      // Try to interpret the string as a LocalDate instead
+      try {
+        DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE;
+        LocalDate base = LocalDate.parse(baseTime, fmt);
+        instant = base.atStartOfDay().atZone(TimeService.utc).toInstant();
+      } catch (DateTimeParseException dtp2) {
+        try {
+          long millis = Long.parseLong(baseTime);
+          instant = Instant.ofEpochMilli(millis);
+        } catch (NumberFormatException nfe) {
+        // No good...
+        instant = Instant.now();
+        System.out.println("Cannot parse " + baseTime + " as number, using now()");
+        }
+      }
     }
     return withSimulationBaseTime(instant);
   }
@@ -562,7 +580,8 @@ public class Competition //implements Serializable
    */
   public Competition withSimulationBaseTime (Instant simulationBaseTime)
   {
-    return withSimulationBaseTime(simulationBaseTime.getMillis());
+    this.simulationBaseTime = simulationBaseTime;
+    return this;
   }
 
   /**
@@ -573,8 +592,7 @@ public class Competition //implements Serializable
   @StateChange
   public Competition withSimulationBaseTime (long baseTime)
   {
-    this.simulationBaseTime = new Instant(baseTime);
-    return this;
+    return withSimulationBaseTime(Instant.ofEpochMilli(baseTime));
   }
 
   /**
@@ -743,7 +761,7 @@ public class Competition //implements Serializable
     //                        getBootstrapTimeslotCount());
     //Instant simBase = 
     //    getSimulationBaseTime().plus(bootstrapOffset);
-    result.put("base", getSimulationBaseTime().getMillis());
+    result.put("base", getSimulationBaseTime().toEpochMilli());
     result.put("rate", getSimulationRate());
     result.put("modulo", getSimulationModulo());
     return result;
