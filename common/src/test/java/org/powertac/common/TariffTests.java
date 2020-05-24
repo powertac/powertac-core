@@ -60,12 +60,12 @@ public class TariffTests
   @BeforeEach
   public void setUp () 
   {
-    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.UTC).toInstant();
     //theRate = 360;       // 6 min/sec -- 10 sec/hr
     //theMod = 15*60*1000; // 15 min (2.5 sec) timeslots
     timeService =
             new TimeService(start.toEpochMilli(),
-                            ZonedDateTime.now(TimeService.utc).toInstant().toEpochMilli(),
+                            ZonedDateTime.now(TimeService.UTC).toInstant().toEpochMilli(),
                             360,
                             15*60*1000);
     timeService.updateTime();
@@ -74,7 +74,7 @@ public class TariffTests
     tariffRepo = new TariffRepo();
     //Competition comp = Competition.newInstance("test");
     broker = new Broker ("testBroker");
-    exp = ZonedDateTime.of(2011, 3, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    exp = ZonedDateTime.of(2011, 3, 1, 12, 0, 0, 0, TimeService.UTC).toInstant();
     tariffSpec = new TariffSpecification(broker, PowerType.CONSUMPTION)
         .withExpiration(exp)
         .withMinDuration(TimeService.WEEK * 8);
@@ -182,13 +182,13 @@ public class TariffTests
     assertTrue(te.init(), "valid Tariff");
     assertEquals(-3.0, te.getUsageCharge(20.0, 200.0, true), 1e-6, "noon price");
     assertEquals(-0.15, te.getRealizedPrice(), 1e-6, "realized price");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.8, te.getUsageCharge(10.0, 220.0, true), 1e-6, "18:00 price");
     assertEquals(-3.8/30.0, te.getRealizedPrice(), 1e-6, "realized price 2");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.4, te.getUsageCharge(5.0, 230.0, true), 1e-6, "midnight price");
     assertEquals(-4.2/35.0, te.getRealizedPrice(), 1e-6, "realized price 3");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.6, te.getUsageCharge(4.0, 235.0, true), 1e-6, "7:00 price");
     assertEquals(-4.8/39.0, te.getRealizedPrice(), 1e-6, "realized price 4");
     assertTrue(te.isCovered(), "covered");
@@ -208,13 +208,13 @@ public class TariffTests
     assertTrue(te.init(), "valid");
     assertEquals(-10.0, te.getUsageCharge(20.0, 200.0, true), 1e-6, "noon price");
     assertEquals(-0.5, te.getRealizedPrice(), 1e-6, "realized price");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-5.0, te.getUsageCharge(10.0, 220.0, true), 1e-6, "18:00 price");
     assertEquals(-0.5, te.getRealizedPrice(), 1e-6, "realized price 2");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-1.0, te.getUsageCharge(5.0, 230.0, true), 1e-6, "midnight price");
     assertEquals(-16.0/35.0, te.getRealizedPrice(), 1e-6, "realized price 3");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-2.0, te.getUsageCharge(4.0, 235.0, true), 1e-6, "7:00 price");
     assertEquals(-18.0/39.0, te.getRealizedPrice(), 1e-6, "realized price 4");
     assertTrue(te.isCovered(), "covered");
@@ -252,37 +252,37 @@ public class TariffTests
     assertTrue(te.isWeekly(), "weekly map");
     //assertEquals("rate map row has 168 entries", 168, te.rateMap[0].size())
     assertTrue(te.isCovered(), "covered");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.6, te.getUsageCharge(10.0, 220.0, true), 1e-6, "18:00 price Sat");
     assertEquals(-1.8/30.0, te.getRealizedPrice(), 1e-6, "realized price 2");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.3, te.getUsageCharge(5.0, 230.0, true), 1e-6, "midnight price Sun");
     assertEquals(-2.1/35.0, te.getRealizedPrice(), 1e-6, "realized price 3");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.24, te.getUsageCharge(4.0, 235.0, true), 1e-6, "7:00 price Sun");
     assertEquals(-2.34/39.0, te.getRealizedPrice(), 1e-6, "realized price 4");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.32, te.getUsageCharge(4.0, 235.0, true), 1e-6, "midnight Mon");
     assertEquals(-2.66/43.0, te.getRealizedPrice(), 1e-6, "realized price 5");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 6, 59, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 6, 59, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.48, te.getUsageCharge(6.0, 235.0, true), 1e-6, "6:59 Mon");
     assertEquals(-3.14/49.0, te.getRealizedPrice(), 1e-6, "realized price 6");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-1.2, te.getUsageCharge(8.0, 235.0, true), 1e-6, "7:00 Mon");
     assertEquals(-4.34/57.0, te.getRealizedPrice(), 1e-6, "realized price 7");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 12, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 12, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-1.5, te.getUsageCharge(10.0, 235.0, true), 1e-6, "noon Tue");
     assertEquals(-5.84/67.0, te.getRealizedPrice(), 1e-6, "realized price 8");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 17, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 17, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-1.05, te.getUsageCharge(7.0, 235.0, true), 1e-6, "17:00 Wed");
     assertEquals(-6.89/74.0, te.getRealizedPrice(), 1e-6, "realized price 9");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 6, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 6, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.72, te.getUsageCharge(9.0, 235.0, true), 1e-6, "18:00 Thu");
     assertEquals(-7.61/83.0, te.getRealizedPrice(), 1e-6, "realized price 10");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 7, 23, 59, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 7, 23, 59, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.96, te.getUsageCharge(12.0, 235.0, true), 1e-6, "23:59 Fri");
     assertEquals(-8.57/95.0, te.getRealizedPrice(), 1e-6, "realized price 11");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 8, 12, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 8, 12, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.18, te.getUsageCharge(3.0, 235.0, true), 1e-6, "midnight Sat");
     assertEquals(-8.75/98.0, te.getRealizedPrice(), 1e-6, "realized price 12");
   }
@@ -299,23 +299,23 @@ public class TariffTests
     tariffSpec.addRate(r3);
     Tariff te = new Tariff(tariffSpec);
     te.init();
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 23, 50, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 23, 50, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.8, te.getUsageCharge(10.0, 220.0, true), 1e-6, "23:50 Sat");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.3, te.getUsageCharge(5.0, 230.0, true), 1e-6, "midnight Sun");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.24, te.getUsageCharge(4.0, 235.0, true), 1e-6, "7:00 price Mon");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 20, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 3, 20, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.48, te.getUsageCharge(8.0, 235.0, true), 1e-6, "20:00 Mon");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 1, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 1, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.12, te.getUsageCharge(2.0, 235.0, true), 1e-6, "1:00 Tue");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 12, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 12, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.3, te.getUsageCharge(5.0, 235.0, true), 1e-6, "noon Tue");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 23, 59, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 4, 23, 59, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-3.0, te.getUsageCharge(50.0, 235.0, true), 1e-6, "23:56 Tue");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.64, te.getUsageCharge(8.0, 235.0, true), 1e-6, "midnight Wed");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 12, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 5, 12, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-2.25, te.getUsageCharge(15.0, 235.0, true), 1e-6, "noon Wed");
   }
 
@@ -334,7 +334,7 @@ public class TariffTests
     assertEquals(-1.5, te.getUsageCharge(10.0, 5.0, true), 1e-6, "noon price, below");
     assertEquals(-2.0, te.getUsageCharge(10.0, 25.0, true), 1e-6, "noon price, above");
     assertEquals(-1.75, te.getUsageCharge(10.0, 15.0, true), 1e-6, "noon price, split");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.4, te.getUsageCharge(5.0, 12.0, true), 1e-6, "midnight price, below");
     assertEquals(-1.0, te.getUsageCharge(5.0, 22.0, true), 1e-6, "midnight price, above");
     assertEquals(-0.76, te.getUsageCharge(5.0, 18.0, true), 1e-6, "midnight price, split");
@@ -359,11 +359,11 @@ public class TariffTests
     assertEquals(-1.5, te.getUsageCharge(10.0, 5.0, true), 1e-6, "noon price, below");
     assertEquals(-2.1, te.getUsageCharge(10.0, 25.0, true), 1e-6, "noon price, above");
     assertEquals(-1.8, te.getUsageCharge(10.0, 15.0, true), 1e-6, "noon price, split");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.4, te.getUsageCharge(5.0, 12.0, true), 1e-6, "midnight price, below");
     assertEquals(-1.05, te.getUsageCharge(5.0, 22.0, true), 1e-6, "midnight price, above");
     assertEquals(-0.79, te.getUsageCharge(5.0, 18.0, true), 1e-6, "midnight price, split");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.8, te.getUsageCharge(10.0, 5.0, true), 1e-6, "evening price, below");
     assertEquals(-2.5, te.getUsageCharge(10.0, 25.0, true), 1e-6, "evening price, above");
     assertEquals(-1.65, te.getUsageCharge(10.0, 15.0, true), 1e-6, "evening price, split");
@@ -388,11 +388,11 @@ public class TariffTests
     assertEquals(1.5, te.getUsageCharge(-10.0, -5.0, true), 1e-6, "noon price, below");
     assertEquals(2.1, te.getUsageCharge(-10.0, -25.0, true), 1e-6, "noon price, above");
     assertEquals(1.8, te.getUsageCharge(-10.0, -15.0, true), 1e-6, "noon price, split");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(0.4, te.getUsageCharge(-5.0, -12.0, true), 1e-6, "midnight price, below");
     assertEquals(1.05, te.getUsageCharge(-5.0, -22.0, true), 1e-6, "midnight price, above");
     assertEquals(0.79, te.getUsageCharge(-5.0, -18.0, true), 1e-6, "midnight price, split");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(0.8, te.getUsageCharge(-10.0, -5.0, true), 1e-6, "evening price, below");
     assertEquals(2.5, te.getUsageCharge(-10.0, -25.0, true), 1e-6, "evening price, above");
     assertEquals(1.65, te.getUsageCharge(-10.0, -15.0, true), 1e-6, "evening price, split");
@@ -439,16 +439,16 @@ public class TariffTests
     assertEquals(-1.0, te.getUsageCharge(10.0, 0.0, false), 1e-6, "current charge, noon Sunday");
 
     // test with hourly charges
-    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant(), -0.09), true);
-    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 13, 0, 0, 0, TimeService.utc).toInstant(), -0.11), true);
-    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 14, 0, 0, 0, TimeService.utc).toInstant(), -0.13), true);
-    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 15, 0, 0, 0, TimeService.utc).toInstant(), -0.14));
+    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.UTC).toInstant(), -0.09), true);
+    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 13, 0, 0, 0, TimeService.UTC).toInstant(), -0.11), true);
+    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 14, 0, 0, 0, TimeService.UTC).toInstant(), -0.13), true);
+    r1.addHourlyCharge(new HourlyCharge(ZonedDateTime.of(2011, 1, 1, 15, 0, 0, 0, TimeService.UTC).toInstant(), -0.14));
     assertEquals(-0.9, te.getUsageCharge(10.0, 0.0, false), 1e-6, "current charge, noon Sunday");
-    assertEquals(-1.1, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 13, 0, 0, 0, TimeService.utc).toInstant(), 10.0, 0.0), 1e-6, "13:00 charge, noon Sunday");
-    assertEquals(-1.3, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 14, 0, 0, 0, TimeService.utc).toInstant(), 10.0, 0.0), 1e-6, "14:00 charge, noon Sunday");
-    assertEquals(-1.4, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 15, 0, 0, 0, TimeService.utc).toInstant(), 10.0, 0.0), 1e-6, "15:00 charge, noon Sunday");
-    assertEquals(-1.0, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 16, 0, 0, 0, TimeService.utc).toInstant(), 10.0, 0.0), 1e-6, "16:00 charge, noon Sunday");
-    assertEquals(-0.8, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant(), 10.0, 0.0), 1e-6, "18:00 charge, noon Sunday");
+    assertEquals(-1.1, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 13, 0, 0, 0, TimeService.UTC).toInstant(), 10.0, 0.0), 1e-6, "13:00 charge, noon Sunday");
+    assertEquals(-1.3, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 14, 0, 0, 0, TimeService.UTC).toInstant(), 10.0, 0.0), 1e-6, "14:00 charge, noon Sunday");
+    assertEquals(-1.4, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 15, 0, 0, 0, TimeService.UTC).toInstant(), 10.0, 0.0), 1e-6, "15:00 charge, noon Sunday");
+    assertEquals(-1.0, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 16, 0, 0, 0, TimeService.UTC).toInstant(), 10.0, 0.0), 1e-6, "16:00 charge, noon Sunday");
+    assertEquals(-0.8, te.getUsageCharge(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant(), 10.0, 0.0), 1e-6, "18:00 charge, noon Sunday");
   }
 
   // single rate, interruptible
@@ -467,7 +467,7 @@ public class TariffTests
     te.init();
     assertEquals(9.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "correct max curtailment 1");
     assertEquals(9.0, te.getMaxUpRegulation(30.0, 1000.0), 1e-6, "correct max curtailment 1");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(9.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "correct max curtailment 1");
   }
 
@@ -510,16 +510,16 @@ public class TariffTests
     te.init();
     assertEquals(-3.0, te.getUsageCharge(20.0, 200.0, true), 1e-6, "noon price");
     assertEquals(3.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "noon max curtailment");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 17, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 17, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-3.0, te.getUsageCharge(20.0, 220.0, true), 1e-6, "17:00 price");
     assertEquals(3.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "17:00 max curtailment");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 1, 18, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.8, te.getUsageCharge(10.0, 240.0, true), 1e-6, "18:00 price");
     assertEquals(15.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "18:00 max curtailment");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 0, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.4, te.getUsageCharge(5.0, 250.0, true), 1e-6, "midnight price");
     assertEquals(15.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "midnight max curtailment");
-    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.utc).toInstant());
+    timeService.setCurrentTime(ZonedDateTime.of(2011, 1, 2, 7, 0, 0, 0, TimeService.UTC).toInstant());
     assertEquals(-0.6, te.getUsageCharge(4.0, 255.0, true), 1e-6, "7:00 price");
     assertEquals(3.0, te.getMaxUpRegulation(30.0, 0.0), 1e-6, "7:00 max curtailment");
     assertEquals((11.0 * -.15 + 13.0 * -.08) / 24.0, te.getMeanConsumptionPrice(), 1e-6, "mean price");

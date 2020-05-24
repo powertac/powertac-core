@@ -449,7 +449,7 @@ public class Tariff
   {
     double result = 0.0;
     // first, get the time index
-    int di = getTimeIndex(ZonedDateTime.ofInstant(when, TimeService.utc));
+    int di = getTimeIndex(ZonedDateTime.ofInstant(when, TimeService.UTC));
     
     // next, adjust the sign of the result. Production is kwh<0, and rate>0.
     // Consumption is kwh>0 and rate<0. If we multiply them, we get the same

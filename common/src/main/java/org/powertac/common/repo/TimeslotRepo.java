@@ -235,7 +235,7 @@ public class TimeslotRepo implements DomainRepo
     Competition comp = Competition.currentCompetition();
     return ZonedDateTime.ofInstant(Instant.ofEpochMilli(comp.getSimulationBaseTime().toEpochMilli()
                         + index * comp.getTimeslotDuration()),
-                        TimeService.utc);
+                        TimeService.UTC);
   }
 
   @Override

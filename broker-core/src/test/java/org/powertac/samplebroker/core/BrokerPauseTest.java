@@ -51,11 +51,11 @@ public class BrokerPauseTest
     Competition.setCurrent(Competition.newInstance("test"));
     competition = Competition.currentCompetition();
     baseTime = ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, 
-                                TimeService.utc).toInstant();
+                                TimeService.UTC).toInstant();
     competition.withSimulationBaseTime(baseTime)
         .withSimulationRate(1800); // 2-second timeslots
     timeService = new TimeService(competition.getSimulationBaseTime().toEpochMilli(),
-                                  ZonedDateTime.now(TimeService.utc).toInstant().toEpochMilli(),
+                                  ZonedDateTime.now(TimeService.UTC).toInstant().toEpochMilli(),
                                   competition.getSimulationRate(),
                                   competition.getSimulationModulo());
     timeService.updateTime();

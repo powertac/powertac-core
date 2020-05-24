@@ -46,8 +46,8 @@ public class TimeServiceTests
   @BeforeEach
   public void setUp() throws Exception
   {
-    theBase = ZonedDateTime.of(2008, 6, 21, 12, 0, 0, 0, TimeService.utc);
-    theStart = ZonedDateTime.now(TimeService.utc);
+    theBase = ZonedDateTime.of(2008, 6, 21, 12, 0, 0, 0, TimeService.UTC);
+    theStart = ZonedDateTime.now(TimeService.UTC);
     theRate = 360;       // 6 min/sec -- 10 sec/hr
     theMod = 15*60*1000; // 15 min (2.5 sec) timeslots
     ts = new TimeService(theBase.toInstant().toEpochMilli(),

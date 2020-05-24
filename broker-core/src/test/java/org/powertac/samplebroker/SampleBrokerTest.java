@@ -54,7 +54,7 @@ public class SampleBrokerTest
   public void setUp () throws Exception
   {
     // set the time
-    baseTime = ZonedDateTime.of(2011, 2, 1, 0, 0, 0, 0, TimeService.utc).toInstant();
+    baseTime = ZonedDateTime.of(2011, 2, 1, 0, 0, 0, 0, TimeService.UTC).toInstant();
 
     // initialize the broker under test
     broker = new PowerTacBroker();
@@ -62,7 +62,7 @@ public class SampleBrokerTest
     Competition.setCurrent(Competition.newInstance("test"));
     Competition competition = Competition.currentCompetition();
     TimeService timeService = new TimeService(competition.getSimulationBaseTime().toEpochMilli(),
-                                              ZonedDateTime.now(TimeService.utc).toInstant().toEpochMilli(),
+                                              ZonedDateTime.now(TimeService.UTC).toInstant().toEpochMilli(),
                                               competition.getSimulationRate(),
                                               competition.getSimulationModulo());
 

@@ -46,7 +46,7 @@ public class OrderbookRepoTests
     repo = new OrderbookRepo();
     timeslotRepo = new TimeslotRepo();
     timeService = new TimeService();
-    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.UTC).toInstant();
     timeService.setCurrentTime(start);
     ReflectionTestUtils.setField(repo, "timeService", timeService);
   }

@@ -45,10 +45,10 @@ public class TariffSpecificationTests
   @BeforeEach
   public void setUp () throws Exception
   {
-    Instant start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    Instant start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.UTC).toInstant();
     timeService =
             new TimeService(start.toEpochMilli(),
-                            ZonedDateTime.now(TimeService.utc).toInstant().toEpochMilli(),
+                            ZonedDateTime.now(TimeService.UTC).toInstant().toEpochMilli(),
                             360,
                             15*60*1000);
     timeService.setCurrentTime(ZonedDateTime.now());
@@ -176,8 +176,8 @@ public class TariffSpecificationTests
   public void testXmlSerialization ()
   {
     Rate r = new Rate().withValue(-0.121).
-            withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc)).
-            withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc)).
+            withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC)).
+            withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.UTC)).
             withTierThreshold(100.0);
     RegulationRate rr = new RegulationRate().
             withUpRegulationPayment(.05).

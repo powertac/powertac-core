@@ -104,7 +104,7 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     Instant base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     Instant newBase = base.plusMillis(TimeService.DAY);
     Competition cx = c1.withSimulationBaseTime(newBase);
@@ -117,7 +117,7 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     Instant base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     long newBase = base.plusMillis(TimeService.DAY).toEpochMilli();
     Competition cx = c1.withSimulationBaseTime(newBase);
@@ -128,7 +128,7 @@ public class CompetitionTests
   @Test
   public void testYMDParse ()
   {
-    Instant bt = ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+    Instant bt = ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     String day = "2010-06-22T00:00:00";
     try {
       DateTimeFormatter fmt = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
@@ -145,7 +145,7 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     Instant base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     String newBase = "2010-06-22";
     Competition cx = c1.withSimulationBaseTime(newBase);
@@ -159,7 +159,7 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     Instant base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     String newBase = "2010-06-22T00:00:00";
     Competition cx = c1.withSimulationBaseTime(newBase);
@@ -173,7 +173,7 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     Instant base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(base, c1.getSimulationBaseTime(), "default base");
     String newBase =
             Long.toString(base.plusMillis(TimeService.DAY).toEpochMilli());
@@ -207,7 +207,7 @@ public class CompetitionTests
   public void testGetClockParams ()
   {
     long base =
-            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant().toEpochMilli();
+            ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant().toEpochMilli();
     long rate = 300l;
     long modulo = 30*60000l;
     Competition c1 = Competition.newInstance("c1")

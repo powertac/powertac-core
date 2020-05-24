@@ -104,7 +104,7 @@ public class Timeslot implements Comparable<Object>
   public ZonedDateTime getStartTime ()
   {
     if (null == startTime)
-      startTime = ZonedDateTime.ofInstant(startInstant, TimeService.utc);
+      startTime = ZonedDateTime.ofInstant(startInstant, TimeService.UTC);
     return startTime;
   }
   

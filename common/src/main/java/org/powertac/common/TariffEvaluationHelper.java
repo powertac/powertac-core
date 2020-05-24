@@ -242,7 +242,7 @@ public class TariffEvaluationHelper
       result += tariff.getUsageCharge(time, usage[index], dailyUsage, this);
       if (includePeriodicCharge)
         result += tariff.getPeriodicPayment() / 24.0;
-      if (ZonedDateTime.ofInstant(time, TimeService.utc).get(ChronoField.HOUR_OF_DAY) == 0) {
+      if (ZonedDateTime.ofInstant(time, TimeService.UTC).get(ChronoField.HOUR_OF_DAY) == 0) {
         //reset the daily usage counter
         dailyUsage = 0.0;
       }

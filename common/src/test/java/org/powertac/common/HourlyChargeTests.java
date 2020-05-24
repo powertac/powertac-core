@@ -34,7 +34,7 @@ public class HourlyChargeTests
   @BeforeEach
   public void setUp () throws Exception
   {
-    now = ZonedDateTime.now(TimeService.utc).toInstant();
+    now = ZonedDateTime.now(TimeService.UTC).toInstant();
     hc = new HourlyCharge(now, 0.21);
   }
 

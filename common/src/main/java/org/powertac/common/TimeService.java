@@ -74,12 +74,12 @@ public class TimeService
   public static final long HOUR = MINUTE * 60;
   public static final long DAY = HOUR * 24;
   public static final long WEEK = DAY * 7;
-  public static ZoneId utc = ZoneId.of("UTC+0");
+  public static ZoneId UTC = ZoneId.of("UTC+0");
   
   // simulation clock parameters
   private long base;
   private long start =
-          ZonedDateTime.of(2036, 12, 31, 23, 59, 0, 0, utc).toInstant().toEpochMilli();
+          ZonedDateTime.of(2036, 12, 31, 23, 59, 0, 0, UTC).toInstant().toEpochMilli();
   private long rate = 720l;
   private long modulo = HOUR;
   
@@ -141,7 +141,7 @@ public class TimeService
   public void init (Instant start)
   {
     currentTime = Instant.ofEpochMilli(start.toEpochMilli() - modulo);
-    currentDateTime = ZonedDateTime.ofInstant(currentTime, utc);
+    currentDateTime = ZonedDateTime.ofInstant(currentTime, UTC);
   }
   
   /**
@@ -291,7 +291,7 @@ public class TimeService
   {
     log.debug("ts" + id + " setCurrentTime to " + time.toString());
     currentTime = time;
-    currentDateTime = ZonedDateTime.ofInstant(time, utc);
+    currentDateTime = ZonedDateTime.ofInstant(time, UTC);
   }
   
   /**

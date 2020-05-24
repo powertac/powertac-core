@@ -50,7 +50,7 @@ public class TariffEvaluationHelperTest
     timeService = new TimeService();
     tariffRepo = new TariffRepo();
     ReflectionTestUtils.setField(teh, "timeService", timeService);
-    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.utc).toInstant();
+    start = ZonedDateTime.of(2011, 1, 1, 12, 0, 0, 0, TimeService.UTC).toInstant();
     timeService.init(start.plusMillis(TimeService.HOUR)); // init subtracts one hour
     broker = new Broker ("testBroker");
     tariffSpec = new TariffSpecification(broker, PowerType.CONSUMPTION);

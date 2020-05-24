@@ -126,7 +126,7 @@ public class Competition //implements Serializable
   //@XStreamAsAttribute
   @XStreamConverter(InstantConverter.class)
   private Instant simulationBaseTime =
-    ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.utc).toInstant();
+    ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
 
   /** timezone offset for scenario locale */
   @XStreamAsAttribute
@@ -550,13 +550,13 @@ public class Competition //implements Serializable
     try {
       DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE_TIME;
       LocalDateTime base = LocalDateTime.parse(baseTime, fmt);
-      instant = base.atZone(TimeService.utc).toInstant();
+      instant = base.atZone(TimeService.UTC).toInstant();
     } catch (DateTimeParseException dtp) {
       // Try to interpret the string as a LocalDate instead
       try {
         DateTimeFormatter fmt = DateTimeFormatter.ISO_DATE;
         LocalDate base = LocalDate.parse(baseTime, fmt);
-        instant = base.atStartOfDay().atZone(TimeService.utc).toInstant();
+        instant = base.atStartOfDay().atZone(TimeService.UTC).toInstant();
       } catch (DateTimeParseException dtp2) {
         try {
           long millis = Long.parseLong(baseTime);

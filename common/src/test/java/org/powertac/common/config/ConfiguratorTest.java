@@ -65,7 +65,7 @@ public class ConfiguratorTest
     uut.configureSingleton(comp);
     assertEquals(15, comp.getTimeslotLength(), "correct timeslot length");
     assertEquals(600, comp.getMinimumTimeslotCount(), "correct min ts count");
-    Instant inst = ZonedDateTime.of(2009, 10, 10, 0, 0, 0, 0, TimeService.utc).toInstant();
+    Instant inst = ZonedDateTime.of(2009, 10, 10, 0, 0, 0, 0, TimeService.UTC).toInstant();
     assertEquals(inst, comp.getSimulationBaseTime(), "correct base time");
   }
 

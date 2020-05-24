@@ -65,7 +65,7 @@ public class OrderbookTests
     timeslotRepo = new TimeslotRepo();
     timeslotRepo.recycle();
     competition = Competition.newInstance("market order test");
-    now = ZonedDateTime.of(2011, 10, 10, 12, 0, 0, 0, TimeService.utc).toInstant();
+    now = ZonedDateTime.of(2011, 10, 10, 12, 0, 0, 0, TimeService.UTC).toInstant();
     timeslotRepo.makeTimeslot(now);
     timeslot = timeslotRepo.makeTimeslot(now.plusMillis(competition.getTimeslotDuration()));
   }

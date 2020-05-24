@@ -178,7 +178,7 @@ public class Rate extends RateCore
       weeklyBegin = NO_TIME;
       return this;
     }
-    return withWeeklyBegin(ZonedDateTime.ofInstant(begin, TimeService.utc));
+    return withWeeklyBegin(ZonedDateTime.ofInstant(begin, TimeService.UTC));
   }
 
   /**
@@ -224,7 +224,7 @@ public class Rate extends RateCore
   public Rate withWeeklyEnd (Instant end)
   {
     if (end != null) {
-      return withWeeklyEnd(ZonedDateTime.ofInstant(end, TimeService.utc));
+      return withWeeklyEnd(ZonedDateTime.ofInstant(end, TimeService.UTC));
     }
     return this;
   }
@@ -275,7 +275,7 @@ public class Rate extends RateCore
       dailyBegin = NO_TIME;
       return null;
     }
-    return withDailyBegin(ZonedDateTime.ofInstant(begin, TimeService.utc));
+    return withDailyBegin(ZonedDateTime.ofInstant(begin, TimeService.UTC));
   }
 
   /**
@@ -324,7 +324,7 @@ public class Rate extends RateCore
       dailyEnd = NO_TIME;
       return this;
     }
-    return withDailyEnd(ZonedDateTime.ofInstant(end, TimeService.utc));
+    return withDailyEnd(ZonedDateTime.ofInstant(end, TimeService.UTC));
   }
 
   /**
@@ -577,7 +577,7 @@ public class Rate extends RateCore
   {
     boolean appliesWeekly = false;
     boolean appliesDaily = false;
-    ZonedDateTime time = ZonedDateTime.ofInstant(when, TimeService.utc);
+    ZonedDateTime time = ZonedDateTime.ofInstant(when, TimeService.UTC);
 
     // check weekly applicability
     int day = time.get(ChronoField.DAY_OF_WEEK);

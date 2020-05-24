@@ -43,13 +43,13 @@ public class RateTests
   public void setUp() 
   {
     timeService = new TimeService();
-    timeService.setCurrentTime(ZonedDateTime.now(TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.now(TimeService.UTC));
   }
   
   @Test
   public void testFixedRate () 
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,0,0,0,0,TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,0,0,0,0,TimeService.UTC));
     Rate r = new Rate().withValue(0.121);
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
@@ -63,7 +63,7 @@ public class RateTests
   @Test
   public void testRateValidity ()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,0,0,0,0,TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,0,0,0,0,TimeService.UTC));
     //timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,0,0,0,0,TimeService.utc));
     Rate r = new Rate().withValue(Double.NaN);
     ReflectionTestUtils.setField(r, "timeService", timeService);
@@ -82,21 +82,21 @@ public class RateTests
   public void testDailyRate ()
   {
     //timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,5,0, 0, 0, TimeService.utc));
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,5,0,0,0,TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,5,0,0,0,TimeService.UTC));
     Rate r = new Rate().withValue(0.121)
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 7, 0, 0, 0, TimeService.utc));
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 7, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.isFixed(), "Rate is fixed");
     assertFalse(r.applies(), "Does not apply now");
-    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 6:00");
-    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 3, 7, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 3, 7, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 7:59");
-    assertFalse(r.applies(ZonedDateTime.of(2012, 3, 3, 9, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2012, 3, 3, 9, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 9:00");
-    assertFalse(r.applies(ZonedDateTime.of(2012, 1, 3, 8, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2012, 1, 3, 8, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 8:00");
   }
 
@@ -104,7 +104,7 @@ public class RateTests
   @Test
   public void testDailyRateOverflow ()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,5,0,0,0, TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,5,0,0,0, TimeService.UTC));
     assertNull(new Rate().withValue(0.121).withDailyBegin(30), "invalid time");
   }
 
@@ -112,21 +112,21 @@ public class RateTests
   @Test
   public void testDailyRateOverMidnight ()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,21,0,0,0,TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,21,0,0,0,TimeService.UTC));
     Rate r = new Rate().withValue(0.121) 
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 22, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 2, 4, 0, 0, 0, TimeService.utc));
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 22, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 2, 4, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.isFixed(), "Rate is fixed");
     assertFalse(r.applies(), "Does not apply now");
-    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 2, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 2, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 22:00");
-    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 3, 4, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2012, 2, 3, 4, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 4:59");
-    assertFalse(r.applies(ZonedDateTime.of(2012, 3, 3, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2012, 3, 3, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 6:00");
-    assertFalse(r.applies(ZonedDateTime.of(2012, 1, 3, 5, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2012, 1, 3, 5, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 5:00");
   }
   
@@ -135,18 +135,18 @@ public class RateTests
   public void testWeeklyRateWeekend()
   {
     Rate r = new Rate().withValue(0.121)
-        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 15, 22, 0, 0, 0, TimeService.utc))
-        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 16, 5, 0, 0, 0, TimeService.utc));
+        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 15, 22, 0, 0, 0, TimeService.UTC))
+        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 16, 5, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.isFixed(), "Rate is fixed");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 21, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 21, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Friday");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                "Applies on Saturday");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies on Sunday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 24, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 24, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Monday");
   }
   
@@ -155,18 +155,18 @@ public class RateTests
   public void testWeeklyRateSun()
   {
     Rate r = new Rate().withValue(0.121)
-        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.utc))
-        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.utc));
+        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.UTC))
+        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.isFixed(), "Rate is fixed");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 21, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 21, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Friday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Saturday");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies on Sunday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 24, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 24, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Monday");
   }
 
@@ -175,18 +175,18 @@ public class RateTests
   public void testWeeklyRateSunMon()
   {
     Rate r = new Rate().withValue(0.121)
-        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.utc))
-        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 17, 5, 0, 0, 0, TimeService.utc));
+        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 16, 22, 0, 0, 0, TimeService.UTC))
+        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 17, 5, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.isFixed(), "Rate is fixed");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 22, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Saturday");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 23, 4, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies on Sunday");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 24, 4, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 24, 4, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies on Monday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 25, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 25, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Tuesday");
   }
   
@@ -195,25 +195,25 @@ public class RateTests
   public void testWeekdayRate()
   {
     Rate r = new Rate().withValue(0.121)
-        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 10, 2, 0, 0, 0, TimeService.utc)) //Monday
-        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 14, 5, 0, 0, 0, TimeService.utc))   //Friday
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 14, 8, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 14, 17, 0, 0, 0, TimeService.utc));
+        .withWeeklyBegin(ZonedDateTime.of(2011, 1, 10, 2, 0, 0, 0, TimeService.UTC)) //Monday
+        .withWeeklyEnd(ZonedDateTime.of(2011, 1, 14, 5, 0, 0, 0, TimeService.UTC))   //Friday
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 14, 8, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 14, 17, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 12, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 22, 12, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Saturday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 30, 12, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 30, 12, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply on Sunday");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 31, 7, 59, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 31, 7, 59, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply Mon morning");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 31, 8, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 31, 8, 0, 0, 0, TimeService.UTC).toInstant()),
                "Starts Mon 8:00");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 31, 17, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 31, 17, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies Mon 17:59");
-    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 31, 18, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(ZonedDateTime.of(2011, 1, 31, 18, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply Mon 18:00");
-    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 28, 17, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(ZonedDateTime.of(2011, 1, 28, 17, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies Fri 17:59");
   }
   
@@ -222,18 +222,18 @@ public class RateTests
   @Test
   public void testDailyRateT0()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.UTC));
     Rate r = new Rate().withValue(0.121) 
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc));
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.UTC));
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertTrue(r.applies(200.0), "Applies now");
-    assertTrue(r.applies(1.0, ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(1.0, ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 6:00");
-    assertTrue(r.applies(2.0, ZonedDateTime.of(2012, 2, 3, 7, 59, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(2.0, ZonedDateTime.of(2012, 2, 3, 7, 59, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 7:59");
-    assertFalse(r.applies(2.0, ZonedDateTime.of(2012, 3, 3, 9, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(2.0, ZonedDateTime.of(2012, 3, 3, 9, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 9:00");
   }
   
@@ -242,17 +242,17 @@ public class RateTests
   @Test
   public void testDailyRateT1()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.UTC));
     Rate r = new Rate().withValue(0.121) 
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc))
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.UTC))
         .withTierThreshold(100.0);
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
     assertFalse(r.applies(99.0), "Does not apply at 99");
-    assertTrue(r.applies(100.0, ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.utc).toInstant()),
+    assertTrue(r.applies(100.0, ZonedDateTime.of(2012, 2, 2, 6, 0, 0, 0, TimeService.UTC).toInstant()),
                "Applies at 6:00, 100");
-    assertFalse(r.applies(80.0, ZonedDateTime.of(2012, 3, 3, 7, 0, 0, 0, TimeService.utc).toInstant()),
+    assertFalse(r.applies(80.0, ZonedDateTime.of(2012, 3, 3, 7, 0, 0, 0, TimeService.UTC).toInstant()),
                 "Does not apply at 7:00, 80");
   }
   
@@ -410,10 +410,10 @@ public class RateTests
   @Test
   public void xmlSerializationTest ()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.UTC));
     Rate r = new Rate().withValue(0.121) 
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc))
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.UTC))
         .withTierThreshold(100.0);
     ReflectionTestUtils.setField(r, "timeService", timeService);
 
@@ -433,12 +433,12 @@ public class RateTests
   @Test
   public void xmlSerializationTestHc ()
   {
-    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.utc));
+    timeService.setCurrentTime(ZonedDateTime.of(2011,1,10,7,0, 0, 0, TimeService.UTC));
     Rate r = new Rate().withFixed(false)
         .withExpectedMean(0.10)
         // applies from 6:00-8:00
-        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.utc))
-        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.utc))
+        .withDailyBegin(ZonedDateTime.of(2011, 1, 1, 6, 0, 0, 0, TimeService.UTC))
+        .withDailyEnd(ZonedDateTime.of(2011, 1, 1, 8, 0, 0, 0, TimeService.UTC))
         .withMaxCurtailment(0.4)
         .withTierThreshold(100.0);
     ReflectionTestUtils.setField(r, "timeService", timeService);
