@@ -32,13 +32,13 @@ import org.powertac.common.msg.MarketBootstrapData;
 import org.powertac.common.state.Domain;
 import org.powertac.common.state.StateChange;
 import org.powertac.common.xml.FullCustomerConverter;
+import org.powertac.common.xml.JtInstantConverter;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-import com.thoughtworks.xstream.converters.time.InstantConverter;
 
 
 /**
@@ -124,7 +124,7 @@ public class Competition //implements Serializable
 
   /** the start time of the simulation scenario, in sim time. */
   //@XStreamAsAttribute
-  @XStreamConverter(InstantConverter.class)
+  @XStreamConverter(JtInstantConverter.class)
   private Instant simulationBaseTime =
     ZonedDateTime.of(2010, 6, 21, 0, 0, 0, 0, TimeService.UTC).toInstant();
 

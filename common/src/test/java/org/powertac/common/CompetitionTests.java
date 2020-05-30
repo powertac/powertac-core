@@ -264,7 +264,7 @@ public class CompetitionTests
     xstream.processAnnotations(Competition.class);
     StringWriter serialized = new StringWriter();
     serialized.write(xstream.toXML(c1));
-    //System.out.println(serialized.toString());
+    System.out.println(serialized.toString());
     Competition xc1 = (Competition)xstream.fromXML(serialized.toString());
     assertNotNull(xc1, "deserialized something");
     assertEquals(c1.getId(), xc1.getId(), "correct id");
