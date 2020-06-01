@@ -107,6 +107,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 public class Rate extends RateCore
 {
   static private Logger log = LogManager.getLogger(Rate.class.getName());
+  @XStreamOmitField
   final Level BFAULT = Level.forName("BFAULT", 250);
   public static final int NO_TIME = -1;
 

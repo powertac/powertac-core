@@ -422,6 +422,7 @@ public class RateTests
     StringWriter serialized = new StringWriter();
     serialized.write(xstream.toXML(r));
     //System.out.println(serialized.toString());
+    
     Rate xr= (Rate)xstream.fromXML(serialized.toString());
     ReflectionTestUtils.setField(xr, "timeService", timeService);
     assertNotNull(xr, "deserialized something");
@@ -458,6 +459,7 @@ public class RateTests
     StringWriter serialized = new StringWriter();
     serialized.write(xstream.toXML(r));
     //System.out.println(serialized.toString());
+
     Rate xr= (Rate)xstream.fromXML(serialized.toString());
     ReflectionTestUtils.setField(xr, "timeService", timeService);
     assertNotNull(xr, "deserialized something");
