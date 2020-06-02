@@ -18,8 +18,10 @@ package org.powertac.common.msg;
 import java.time.Instant;
 
 import org.powertac.common.state.Domain;
+import org.powertac.common.xml.JtInstantConverter;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 /**
  * This message is used to communicate a revised simulation start time
@@ -31,6 +33,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("sim-resume")
 public class SimResume 
 {
+  @XStreamConverter(JtInstantConverter.class)
   private Instant start;
   
   public SimResume (Instant newStart)
