@@ -47,5 +47,6 @@
 **/.DS_Store
 **/Thumbs.db
 **/Desktop.ini
+**/.attach_pid*
 
 
