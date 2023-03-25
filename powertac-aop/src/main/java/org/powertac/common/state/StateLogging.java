@@ -20,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.logging.log4j.LogManager;
@@ -53,6 +55,10 @@ public class StateLogging
 {
   static private Logger log = LogManager.getLogger(StateLogging.class);
   private Logger stateLog = LogManager.getLogger("State");
+
+  // package-prefix abbreviation map
+  static private LinkedHashMap<String, String> abbreviations = null;
+  static boolean classnameAbbreviation = false;
 
   // state-change methods
   @Pointcut ("execution (@StateChange * * (..))")
@@ -125,11 +131,12 @@ public class StateLogging
     return properties.toArray();
   }
 
+  // writes out a single log entry
   private void writeLog (String className, Long id,
                          String methodName, Object[] args)
   {
     StringBuffer buf = new StringBuffer();
-    buf.append(className).append("::");
+    buf.append(abbreviate(className)).append("::");
     buf.append((id == null) ? "null" : id.toString()).append("::");
     buf.append(methodName);
     for (Object arg : args) {
@@ -183,5 +190,77 @@ public class StateLogging
     catch (Exception ex) {
     }
     return id;
+  }
+
+  // --------- static methods to handle classname abbreviation
+
+  /**
+   * Sets up the classname abbreviation feature. If the parameter is true,
+   * then classnames will be abbreviated. This should obviously be called
+   * before any logging happens.
+   */
+  public static void setClassnameAbbreviation (boolean abbreviation)
+  {
+    classnameAbbreviation = abbreviation;
+  }
+
+  // abbreviates a classname 
+  private static String abbreviate (String classname)
+  {
+    String result = classname;
+    if (!classnameAbbreviation)
+      return classname;
+    else {
+      ensureAbbreviations();
+      for (Map.Entry<String, String> abbr : abbreviations.entrySet()) {
+        if (classname.startsWith(abbr.getKey())) {
+          result = classname.substring(abbr.getKey().length());
+          result = abbr.getValue() + result;
+          break;
+        }
+      }
+      return result;
+    }
+  }
+
+  private static void ensureAbbreviations ()
+  {
+    if (null == abbreviations) {
+      abbreviations = new LinkedHashMap<>();
+      abbreviations.put("org.powertac.common.msg.", "cm.");
+      abbreviations.put("org.powertac.common.", "c.");
+      abbreviations.put("org.powertac.", "");
+    }
+  }
+
+  /**
+   * Given a possibly abbreviated classname, returns
+   * the unabbreviated version.
+   */
+  public static String unabbreviate (String origClassname)
+  {
+    ensureAbbreviations();
+    String result = origClassname;
+    if (origClassname.startsWith("org.powertac."))
+      return result;
+    try {
+      Class clazz = Class.forName(origClassname);
+    } catch (ClassNotFoundException cnf) {
+      // If the class doesn't exist, assume the name is abbreviated
+      for (Map.Entry<String, String> abbr : abbreviations.entrySet()) {
+        if (abbr.getValue().length() > 0 &&
+                origClassname.startsWith(abbr.getValue())) {
+          // non-empty abbreviation, replace with expansion
+          result = origClassname.substring(abbr.getValue().length());
+          result = abbr.getKey() + result;
+          break;
+        }
+        else if (abbr.getValue().length() == 0) {
+          // last is org.powertac type, no abbreviation
+          result = abbr.getKey() + result;
+        }
+      }
+    }
+    return result;
   }
 }

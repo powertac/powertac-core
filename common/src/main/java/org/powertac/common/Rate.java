@@ -87,7 +87,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
  * It is possible for multiple rates to be applicable at any given combination
  * of time/usage. If this is the case, the most specific rate applies. So if
  * there is a fixed rate that applies all the time, it will be overridden by
- * a time-of-use rate during its period of applibility. Also, if the times for
+ * a time-of-use rate during its period of applicability. Also, if the times for
  * time-of-use rates overlap, they
  * are sorted by start-time, and the applicable rate with the latest start time
  * will apply. This logic is implemented in Tariff.
@@ -107,8 +107,10 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 public class Rate extends RateCore
 {
   static private Logger log = LogManager.getLogger(Rate.class.getName());
+
   @XStreamOmitField
   final Level BFAULT = Level.forName("BFAULT", 250);
+
   public static final int NO_TIME = -1;
 
   @XStreamAsAttribute
@@ -726,10 +728,16 @@ public class Rate extends RateCore
   public boolean isValid(PowerType powerType)
   {
     // numeric sanity test
-    if (Double.isNaN(minValue) || Double.isNaN(maxValue)
-        || Double.isNaN(expectedMean)) {
-      log.log(BFAULT, "numeric insanity: ("
-          + minValue + "," + maxValue + "," + expectedMean + ")");
+    if (Double.isNaN(minValue)) {
+      log.log(BFAULT, "minValue NaN");
+      return false;
+    }
+    else if (Double.isNaN(maxValue)) {
+      log.log(BFAULT, "maxValue NaN");
+      return false;
+    }
+    else if (Double.isNaN(expectedMean)) {
+      log.log(BFAULT, "expectedMean NaN");
       return false;
     }
     if (Double.isInfinite(minValue) || Double.isInfinite(maxValue)

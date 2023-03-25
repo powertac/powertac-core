@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.powertac.common.Competition;
 import org.powertac.common.enumerations.PowerType;
 import org.powertac.common.msg.MarketBootstrapData;
 import org.powertac.common.repo.TariffRepo;

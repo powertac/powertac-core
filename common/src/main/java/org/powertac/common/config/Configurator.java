@@ -51,6 +51,7 @@ import org.apache.commons.configuration2.io.CombinedLocationStrategy;
 import org.apache.commons.configuration2.io.FileLocationStrategy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.powertac.common.XMLMessageConverter;
 import org.powertac.util.Predicate;
 
 /**
@@ -417,6 +418,7 @@ public class Configurator
   public void gatherBootstrapState (Object thing,
                                     ConfigurationRecorder recorder)
   {
+    log.info("gatherBootstrapState for {}", thing.getClass().getName());
     if (thing instanceof List) {
       gatherBootstrapList((List<Object>)thing, recorder);
     }
@@ -757,6 +759,12 @@ public class Configurator
           def.add((String)thing);
       return conf.getList(key, def);
     }
+    else if (type.equals("XML")) {
+      // deserialize the xml to produce a value
+      XMLMessageConverter converter = new XMLMessageConverter();
+      converter.afterPropertiesSet();
+      return converter.fromXML(conf.getString(key));
+    }
     else {
       // do it by reflection
     Class<?> clazz = findNamedClass(type);
@@ -838,9 +846,9 @@ public class Configurator
                 Class<?> valueClass = findNamedClass(cv.valueType());
                 if (!getter.getReturnType().isPrimitive() &&
                     !valueClass.isAssignableFrom(getter.getReturnType())) {
-                  log.warn("Type mismatch: cannot use default value (" +  
-                           getter.getReturnType().getName() + ") for " +
-                           cv.name() + " (" + valueClass.getName() + ")");
+                  log.warn("Type mismatch, class {}: cannot use default value ({}) for {} ({})", 
+                           clazz.getName(), getter.getReturnType().getName(),
+                           cv.name(), valueClass.getName());
                   getter = null;
                 }
               }

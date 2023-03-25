@@ -66,7 +66,9 @@ public class Competition //implements Serializable
   @XStreamAsAttribute
   private String pomId = "unknown";
 
-  /** length of a timeslot in simulation minutes    */
+  /** length of a timeslot in simulation minutes. Note that if this is not one hour,
+   *  there will likely be problems with other elements of the simulation, such as
+   *  weather reporting. */
   @XStreamAsAttribute
   private int timeslotLength = 60;
   
@@ -136,11 +138,12 @@ public class Competition //implements Serializable
   @XStreamAsAttribute
   private int latitude = 45;
   
-  /** the time-compression ratio for the simulation. So if we are running one-hour timeslots every 5 seconds, the rate would be 720 (=default).    */
+  /** the time-compression ratio for the simulation. So if we are running
+   *  one-hour timeslots every 5 seconds, the rate would be 720 (=default). * */
   @XStreamAsAttribute
   private long simulationRate = 720l;
 
-  /** controls the values of simulation time values reported. If
+  /** controls the granularity of simulation time. If
    *  we are running one-hour timeslots, then the modulo should be one hour, expressed
    *  in milliseconds. If we are running one-hour timeslots but want to update time every
    *  30 minutes of simulated time, then the modulo would be 30*60*1000. Note that
@@ -170,7 +173,12 @@ public class Competition //implements Serializable
   
   public static Competition newInstance (String name)
   {
-    Competition result = new Competition(name);
+    return newInstance(name, true);
+  }
+  
+  public static Competition newInstance (String name, boolean singleton)
+  {
+    Competition result = new Competition(name, singleton);
     //theCompetition = result;
     return result;
   }
@@ -195,16 +203,23 @@ public class Competition //implements Serializable
   }
   
   /**
-   * Constructor replaces current competition instance. It is up to the
+   * private constructor optionally replaces current competition instance. It is up to the
    * caller to ensure that this is done at the correct time.
    */
-  private Competition (String name)
+  private Competition (String name, boolean singleton)
   {
     super();
     this.name = name;
     brokers = new ArrayList<String>();
     customers = new ArrayList<CustomerInfo>();
-    theCompetition = this;
+    if (singleton)
+      theCompetition = this;
+  }
+
+  // Original constructor
+  private Competition (String name)
+  {
+    this(name, true);
   }
 
   public long getId ()
@@ -689,35 +704,49 @@ public class Competition //implements Serializable
   /**
    * Fluent setter for time compression ratio. Default value is 720, which
    * runs 1-hour timeslots in 5 real-time seconds.
+   * Value may be adjusted to make real-world timeslot length an integer
+   * number of milliseconds.
    */
-  @ConfigurableValue(valueType = "Integer",
-    description = "Time compression ratio for simulation clock")
   @StateChange
   public Competition withSimulationRate (long simulationRate)
   {
     this.simulationRate = simulationRate;
+    adjustRate();
     return this;
+  }
+
+  // find int rate that makes timeslot clock time be an integer number of msec by finding r'
+  // as the largest integer < rate that gives integer timeslot length. We do this by factoring.
+  private void adjustRate()
+  {
+    long sr = 0;
+    for (long r = simulationRate; r > 0; r--) {
+      if (getTimeslotDuration() % r == 0) {
+        sr = r;
+        break;
+      }
+    }
+    simulationRate = sr;
   }
   
   /**
-   * Returns the number of seconds in wall-clock time per timeslot, truncated
-   * to an integer.
+   * Returns the number of seconds in wall-clock time per timeslot.
    */
-  public int getSimulationTimeslotSeconds ()
+  public double getSimulationTimeslotSeconds ()
   {
-    return timeslotLength * 60 / (int)simulationRate;
+    return timeslotLength * 60.0 / simulationRate;
   }
   
   /**
    * Fluent setter for controlling simulation rate by setting the number of
-   * wall-clock seconds per timeslot. Only integer values are allowed.
+   * wall-clock seconds per timeslot.
    * Results may be strange if timeslotLength is changed after this is set.
    */
-  @ConfigurableValue(valueType = "Integer",
+  @ConfigurableValue(valueType = "Double",
       description = "Time compression ratio for simulation clock")
-  public Competition withSimulationTimeslotSeconds (int seconds)
+  public Competition withSimulationTimeslotSeconds (double seconds)
   {
-    return withSimulationRate((long)(timeslotLength * 60 / seconds));
+    return withSimulationRate(Math.round(timeslotLength * 60.0 / seconds));
   }
 
   /**

@@ -60,7 +60,7 @@ import org.powertac.common.spring.SpringApplicationContext;
  * constructor is provided, along with an init() method that clears out
  * state and optionally sets parameter values.
  * 
- * Evalution of time-of-use rates depends on being able to compute the hour
+ * Evaluation of time-of-use rates depends on being able to compute the hour
  * of the day for some arbitrary offset. This functionality depends on the
  * Joda Time "default time zone" being set to DateTimeZone.UTC. This normally
  * happens in the TimeService, but may also need to be done in test code.
@@ -234,8 +234,10 @@ public class TariffEvaluationHelper
     double dailyUsage = 0.0;
     double result = 0.0;
     Instant time = start;
-    if (null == time)
+    if (null == time) {
       log.error("Time is null!");
+      time = timeService.getCurrentTime();
+    }
     for (int index = 0; index < usage.length; index++) {
       // TODO -- hard-coded one hour granularity
       time = time.plusMillis(TimeService.HOUR);
@@ -267,10 +269,11 @@ public class TariffEvaluationHelper
   }
 
   // discount regulation using logistic function
+  // note that this is never called in a boot session
   double computeDiscountedReg (Tariff tariff)
   {
     double result = 0.0;
-    double mktPrice = getMarketBootstrapData().getMeanMarketPrice() / -1000.0;
+    double mktPrice = getMarketBootstrapData().getMeanMarketPrice() / -1000.0; // kWh
 
     // Discount with logistic function
     // 1-1/(1+exp(-3*(x-4))) produces 0.95 for upreg rate 3 times mkt price,

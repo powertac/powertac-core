@@ -54,6 +54,14 @@ public class MessageDispatcher
       // see if we can find the method directly
       Method method = target.getClass().getMethod(methodName, classes);
       log.debug("found method " + method);
+      if (!method.canAccess(target))
+      {
+        log.debug("Making {} accessible", methodName);
+        if (!method.trySetAccessible())
+        {
+          log.error("Unable to make method {} accessible", methodName);
+        }
+      }
       result = method.invoke(target, args);
     }
     catch (NoSuchMethodException nsm) {
@@ -66,11 +74,15 @@ public class MessageDispatcher
                    + thr.getStackTrace()[0] + "\n  ..at "
                    + thr.getStackTrace()[1] + "\n  ..at "
                    + thr.getStackTrace()[2] + "\n  ..at "
-                   + thr.getStackTrace()[3] + "\n  ..at "
+                   + thr.getStackTrace()[3] + "\n  ..at ..."
                    );      
     }
     catch (Exception ex) {
-      log.error("Exception calling message processor: " + ex.toString());
+      log.error("Exception calling " + methodName + " " + ex.toString() + "\n  ..at "
+                + ex.getStackTrace()[0] + "\n  ..at "
+                + ex.getStackTrace()[1] + "\n  ..at "
+                + ex.getStackTrace()[2] + "\n  ..at "
+                + ex.getStackTrace()[3] + "\n  ..at ...");
     }
     return result;
   }

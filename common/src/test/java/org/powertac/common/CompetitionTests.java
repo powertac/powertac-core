@@ -41,6 +41,18 @@ public class CompetitionTests
   }
 
   @Test
+  public void testNonSingletonInstance ()
+  {
+    Competition c1 = Competition.newInstance("c1");
+    assertNotNull(c1, "c1 created");
+    assertEquals(c1, Competition.currentCompetition(), "c1 retreival");
+    assertEquals("c1", c1.getName(), "name property");
+    Competition c2 = Competition.newInstance("c2", false);
+    assertEquals(c1, Competition.currentCompetition(), "c1 retreival");
+    assertEquals("c2", c2.getName(), "name property");
+  }
+
+  @Test
   public void testSetDescription ()
   {
     Competition c1 = Competition.newInstance("c1");
@@ -188,9 +200,14 @@ public class CompetitionTests
   {
     Competition c1 = Competition.newInstance("c1");
     assertEquals(720l, c1.getSimulationRate(), "default rate");
-    Competition cx = c1.withSimulationRate(300l);
+    Competition cx = c1.withSimulationTimeslotSeconds(7.5);
     assertEquals(c1, cx, "correct return");
-    assertEquals(300l, c1.getSimulationRate(), "new rate");
+    assertEquals(480l, c1.getSimulationRate(), "new rate");
+    cx = cx.withSimulationTimeslotSeconds(2.5);
+    assertEquals(c1, cx, "correct return 2");
+    assertEquals(1440l, c1.getSimulationRate(), "2nd new rate");
+    cx = cx.withSimulationTimeslotSeconds(1.9);
+    assertEquals(1875l, cx.getSimulationRate(), "3rd new rate");
   }
 
   @Test
