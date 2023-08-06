@@ -28,15 +28,17 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 public class RateCore extends XStreamStateLoggable
 {
   @XStreamAsAttribute
-  private long id = IdGenerator.createId();
+  private long id = 0l;
   @XStreamAsAttribute
   private long tariffId;
 
   /**
-   * Returns the id of this Rate
+   * Initializes if needed, then returns the id of this Rate
    */
   public long getId ()
   {
+    if (0l == id)
+      id = IdGenerator.createId();
     return id;
   }
 

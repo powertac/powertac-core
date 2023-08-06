@@ -27,7 +27,7 @@ package org.powertac.common;
 public class IdGenerator 
 {
   private static int prefix = 0; // invalid default value
-  private static int counter = 0;
+  private static int counter = 1; // ensure that 0 is never a valid id
   private static int multiplier = 100000000;
 
   /**

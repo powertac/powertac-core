@@ -31,7 +31,7 @@ extends XStreamStateLoggable
 implements ValidatableMessage
 {
   @XStreamAsAttribute
-  protected long id = IdGenerator.createId();
+  protected long id = 0l;
   
   /** The broker originating this message */
   @XStreamConverter(BrokerConverter.class)
@@ -45,6 +45,8 @@ implements ValidatableMessage
 
   public long getId ()
   {
+    if (0l == id)
+      id = IdGenerator.createId();
     return id;
   }
 

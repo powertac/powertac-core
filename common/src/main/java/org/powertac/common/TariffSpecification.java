@@ -203,18 +203,6 @@ public class TariffSpecification extends TariffMessage
     return this;
   }
 
-  @Override
-  public long getId ()
-  {
-    return id;
-  }
-
-  @Override
-  public Broker getBroker ()
-  {
-    return broker;
-  }
-
   /**
    * Returns the Rate instances from among the rates in this tariff spec.
    */
@@ -271,7 +259,7 @@ public class TariffSpecification extends TariffMessage
       // readResolve does not create the list
       rates = new ArrayList<RateCore>();
     rates.add(rate);
-    rate.setTariffId(id);
+    rate.setTariffId(getId());
     return this;
   }
 
