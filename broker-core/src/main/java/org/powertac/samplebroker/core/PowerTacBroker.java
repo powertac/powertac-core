@@ -19,8 +19,9 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
-import org.apache.commons.configuration2.PropertiesConfiguration;
+//import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.Instant;
@@ -171,13 +172,20 @@ implements BrokerContext
    * Starts a new session, setting parameters from command-line and from
    * config file. 
    */
-  public void startSession (PropertiesConfiguration cli,
+  public void startSession (Properties cli,
                             File configFile, long end)
   {
     quittingTime = end;
     propertiesService.addProperties(cli);  // are these in the correct order?
-    if (null != configFile && configFile.canRead())
-      propertiesService.setUserConfig(configFile);
+    if (null != configFile && configFile.canRead()) {
+      try {
+        propertiesService.setUserConfig(configFile);
+      }
+      catch (Exception ex) {
+        log.error("failed to load config file {}", ex.toString());
+        return;
+      }
+    }
     propertiesService.configureMe(this);
 
     // Initialize and run.

@@ -18,13 +18,14 @@ package org.powertac.samplebroker.core;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-import org.apache.commons.configuration2.PropertiesConfiguration;
+//import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -99,7 +100,7 @@ public class BrokerRunner
     //String queueName = null;
     //String serverQueue = null;
     long end = 0l;
-    PropertiesConfiguration cliProps = new PropertiesConfiguration();
+    Properties cliProps = new Properties();
 
     try {
       // process broker options

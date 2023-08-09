@@ -16,9 +16,12 @@
 package org.powertac.samplebroker.core;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.commons.configuration2.CompositeConfiguration;
@@ -57,8 +60,7 @@ implements ApplicationContextAware
    */
   public BrokerPropertiesService ()
   {
-    super();
-    
+    super();    
     recycle();
   }
 
@@ -85,18 +87,54 @@ implements ApplicationContextAware
     if (initialized)
       return;
     initialized = true;
+    log.debug("lazyInit");
 
     // find and load the default properties file
-    log.debug("lazyInit");
+    ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+    Enumeration<URL> resources = null;
     try {
-      File defaultProps = new File("broker.properties");
-      log.info("adding " + defaultProps.getName());
-      PropertiesConfiguration pconfig = new PropertiesConfiguration();
-      pconfig.read(new FileReader(defaultProps));
-      config.addConfiguration(pconfig);
+      resources = classloader.getResources("config/");
+    } catch (IOException ioe) {
+      log.error("Cannot fetch config resource", ioe.getMessage());
+    }
+    if (null == resources)
+      return;
+    URL first = resources.nextElement();
+    FileFilter filter =
+        file -> (file.exists() && !file.isDirectory() &&
+                 !file.getName().equals("server.properties"));
+    String configDir = first.getFile();
+    File[] files =  new File(configDir).listFiles(filter);
+    if (null == files)
+      files = null;
+    if (files != null) {
+      for (File file : files) {
+        try {
+          if (file.toString().endsWith(".xml")) {
+            log.debug("adding " + file.getName());
+            config.addConfiguration(Configurator.readXML(file));
+          }
+          else if (file.toString().endsWith(".properties")) {
+            log.debug("adding " + file.getName());
+            config.addConfiguration(Configurator.readProperties(file));
+          }
+        }
+        catch (Exception e) {
+          log.warn("Unable to load properties file: " + file);
+        }
+      }
+    }
+
+    // find and load the default properties file
+    try {
+      File defaultProps = new File(configDir + "/broker.properties");
+      if (defaultProps.canRead()) {
+        log.debug("adding " + defaultProps.getName());
+        config.addConfiguration(Configurator.readProperties(defaultProps));
+      }
     }
     catch (Exception e1) {
-      log.warn("broker.properties not found: " + e1.toString());
+      log.warn("config/broker.properties not found: " + e1.toString());
     }
     
     // set up the classpath props
@@ -112,7 +150,7 @@ implements ApplicationContextAware
       for (Resource prop : propResources) {
         if (validPropResource(prop)) {
           if (null == prop) {
-            log.error("Null resource");
+            log.error("Null resource {}", prop.getFilename());
           }
           log.info("loading config from " + prop.getURI());
           config.addConfiguration(Configurator.readProperties(prop.getURL()));
@@ -129,24 +167,33 @@ implements ApplicationContextAware
     // set up the configurator
     configurator.setConfiguration(config);
   }
-  
+
   public void setUserConfig (File userConfig)
+          throws ConfigurationException, IOException
   {
     // then load the user-specified config
-    try {
-      PropertiesConfiguration pconfig = new PropertiesConfiguration();
-      pconfig.read(new FileReader(userConfig));
-      config.addConfiguration(pconfig);
-      log.debug("setUserConfig " + userConfig.getName());
-    }
-    catch (ConfigurationException e) {
-      log.error("Config error loading " + userConfig + ": " + e.toString());
-    }
-    catch (Exception e) {
-      log.error("Error loading configuration: " + e.toString());
-    }
+    config.addConfiguration(Configurator.readProperties(userConfig));
+    log.debug("setUserConfig " + userConfig);
     lazyInit();
   }
+
+//  public void setUserConfig (File userConfig)
+//  {
+//    // then load the user-specified config
+//    try {
+//      PropertiesConfiguration pconfig = new PropertiesConfiguration();
+//      pconfig.read(new FileReader(userConfig));
+//      config.addConfiguration(pconfig);
+//      log.debug("setUserConfig " + userConfig.getName());
+//    }
+//    catch (ConfigurationException e) {
+//      log.error("Config error loading " + userConfig + ": " + e.toString());
+//    }
+//    catch (Exception e) {
+//      log.error("Error loading configuration: " + e.toString());
+//    }
+//    lazyInit();
+//  }
 
   /**
    * Adds the Properties structure to the broker configuration. Earlier
@@ -154,19 +201,33 @@ implements ApplicationContextAware
    */
   public void addProperties (Properties props)
   {
-    PropertiesConfiguration pconfig = new PropertiesConfiguration();
-    props.forEach((key, value) -> pconfig.addProperty((String) key, value));
-    addProperties(pconfig);
+    lazyInit();
+    for (Object key : props.keySet()) {
+      Object value = props.get(key);
+      if (value instanceof String && ((String) value).startsWith("[")) {
+        // clean up list format
+        String str = (String)value;
+        value = str.substring(1, str.length() - 2);
+      }
+      config.setProperty((String)key, value);
+    }
   }
+  
+//  public void addProperties (Properties props)
+//  {
+//    PropertiesConfiguration pconfig = new PropertiesConfiguration();
+//    props.forEach((key, value) -> pconfig.addProperty((String) key, value));
+//    addProperties(pconfig);
+//  }
 
-  /**
-   * Adds the PropertiesConfiguration to the broker configuration. Earlier
-   * configuration sources take precedence over later sources.
-   */
-  public void addProperties (PropertiesConfiguration props)
-  {
-    config.addConfiguration(props);
-  }
+//  /**
+//   * Adds the PropertiesConfiguration to the broker configuration. Earlier
+//   * configuration sources take precedence over later sources.
+//   */
+//  public void addProperties (PropertiesConfiguration props)
+//  {
+//    config.addConfiguration(props);
+//  }
 
   public void configureMe (Object target)
   {
@@ -177,7 +238,8 @@ implements ApplicationContextAware
   public Collection<?> configureInstances (Class<?> target)
   {
     lazyInit();
-    return configurator.configureInstances(target);
+    Collection<?> result = configurator.configureInstances(target);
+    return result;
   }
   
   public String getProperty (String name)
