@@ -40,7 +40,7 @@
     <java.version_max>23</java.version_max>
     <java.version_end>24</java.version_end>
     <maven.version>3.9.9</maven.version>
-    <spring.version>6.2.0</spring.version>
+    <spring.version>6.2.7</spring.version>
 
     <!-- Build layout -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
